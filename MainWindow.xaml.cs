@@ -368,6 +368,11 @@ namespace RemnantSaveManager
 
         private void BtnClearBackups_Click(object sender, RoutedEventArgs e)
         {
+            int toDeleteCount = this.listBackups.Count(t => !t.Keep && !t.Active && t.Name == t.SaveDate.Ticks.ToString());
+            MessageBoxResult confirmResult = MessageBox.Show($"Are you sure to delete {toDeleteCount} backups?\nWill NOT delete named backups, or backups marked as \"Keep\".",
+                                     "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
+            if (confirmResult == MessageBoxResult.No) return;
+
             List<SaveBackup> removeBackups = new List<SaveBackup>();
             for (int i = 0; i < this.listBackups.Count; i++)
             {
@@ -971,7 +976,7 @@ namespace RemnantSaveManager
         {
             SaveBackup save = (SaveBackup)dataBackups.SelectedItem;
             var confirmResult = MessageBox.Show("Are you sure to delete backup \"" + save.Name + "\" (" + save.SaveDate.ToString() + ")?",
-                                     "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
+                                     "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
             if (confirmResult == MessageBoxResult.Yes)
             {
                 if (save.Keep)
