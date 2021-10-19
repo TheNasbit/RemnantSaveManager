@@ -366,6 +366,26 @@ namespace RemnantSaveManager
             }
         }
 
+        private void BtnClearBackups_Click(object sender, RoutedEventArgs e)
+        {
+            List<SaveBackup> removeBackups = new List<SaveBackup>();
+            for (int i = 0; i < this.listBackups.Count; i++)
+            {
+                if (!this.listBackups[i].Keep && !this.listBackups[i].Active && this.listBackups[i].Name == this.listBackups[i].SaveDate.Ticks.ToString())
+                {
+                    logMessage("Deleting backup " + listBackups[i].Name + " (" + listBackups[i].SaveDate + ")");
+                    removeBackups.Add(listBackups[i]);
+                }
+            }
+
+            foreach (SaveBackup backup in removeBackups)
+            {
+                Directory.Delete(backupDirPath + "\\" + backup.SaveDate.Ticks, true);
+                this.listBackups.Remove(backup);
+            }
+            this.dataBackups.Items.Refresh();
+        }
+
         private void BtnBackup_Click(object sender, RoutedEventArgs e)
         {
             doBackup();
@@ -791,6 +811,7 @@ namespace RemnantSaveManager
                     Directory.Delete(backupDirPath + "\\" + backup.SaveDate.Ticks, true);
                     this.listBackups.Remove(backup);
                 }
+                dataBackups.Items.Refresh();
             }
         }
 
