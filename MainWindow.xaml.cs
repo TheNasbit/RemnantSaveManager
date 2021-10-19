@@ -165,6 +165,8 @@ namespace RemnantSaveManager
 
             chkCreateLogFile.IsChecked = Properties.Settings.Default.CreateLogFile;
 
+            chkKeepNamedBackup.IsChecked = Properties.Settings.Default.KeepNamedBackups;
+
             saveTimer = new System.Timers.Timer();
             saveTimer.Interval = 2000;
             saveTimer.AutoReset = false;
@@ -425,7 +427,7 @@ namespace RemnantSaveManager
                         listBackups.Add(backup);
                     }
                 }
-                checkBackupLimit();
+                this.CheckBackupLimit();
                 dataBackups.Items.Refresh();
                 this.ActiveSaveIsBackedUp = true;
                 logMessage($"Backup completed ({saveDate.ToString()})!", LogType.Success);
@@ -766,26 +768,28 @@ namespace RemnantSaveManager
             }
         }
 
-        private void checkBackupLimit()
+        private void CheckBackupLimit()
         {
-            if (listBackups.Count > Properties.Settings.Default.BackupLimit && Properties.Settings.Default.BackupLimit > 0)
+            bool keepNamed = Properties.Settings.Default.KeepNamedBackups;
+            int countBackups = keepNamed ? this.listBackups.Count(t => t.Name == t.SaveDate.Ticks.ToString()) : this.listBackups.Count;
+            if (countBackups > Properties.Settings.Default.BackupLimit && Properties.Settings.Default.BackupLimit > 0)
             {
                 List<SaveBackup> removeBackups = new List<SaveBackup>();
-                int delNum = listBackups.Count - Properties.Settings.Default.BackupLimit;
-                for (int i = 0; i < listBackups.Count && delNum > 0; i++)
+                int delNum = countBackups - Properties.Settings.Default.BackupLimit;
+                for (int i = 0; i < this.listBackups.Count && delNum > 0; i++)
                 {
-                    if (!listBackups[i].Keep && !listBackups[i].Active)
+                    if (!this.listBackups[i].Keep && !this.listBackups[i].Active && (!keepNamed || this.listBackups[i].Name == this.listBackups[i].SaveDate.Ticks.ToString()))
                     {
                         logMessage("Deleting excess backup " + listBackups[i].Name + " (" + listBackups[i].SaveDate + ")");
-                        Directory.Delete(backupDirPath + "\\" + listBackups[i].SaveDate.Ticks, true);
                         removeBackups.Add(listBackups[i]);
                         delNum--;
                     }
                 }
 
-                for (int i=0; i < removeBackups.Count; i++)
+                foreach (SaveBackup backup in removeBackups)
                 {
-                    listBackups.Remove(removeBackups[i]);
+                    Directory.Delete(backupDirPath + "\\" + backup.SaveDate.Ticks, true);
+                    this.listBackups.Remove(backup);
                 }
             }
         }
@@ -1143,12 +1147,23 @@ namespace RemnantSaveManager
 
         private void chkCreateLogFile_Click(object sender, RoutedEventArgs e)
         {
-            bool newValue = chkCreateLogFile.IsChecked.HasValue ? chkCreateLogFile.IsChecked.Value : false;
+            bool newValue = chkCreateLogFile.IsChecked ?? false;
             if (newValue & !Properties.Settings.Default.CreateLogFile)
             {
                 System.IO.File.WriteAllText("log.txt", DateTime.Now.ToString() + ": Version " + typeof(MainWindow).Assembly.GetName().Version + "\r\n");
             }
             Properties.Settings.Default.CreateLogFile = newValue;
+            Properties.Settings.Default.Save();
+        }
+
+        private void ChkKeepNamedBackup_Click(object sender, RoutedEventArgs e)
+        {
+            bool newValue = this.chkKeepNamedBackup.IsChecked ?? false;
+            if (newValue & !Properties.Settings.Default.KeepNamedBackups)
+            {
+
+            }
+            Properties.Settings.Default.KeepNamedBackups = newValue;
             Properties.Settings.Default.Save();
         }
 
