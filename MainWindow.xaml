@@ -50,9 +50,6 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="46"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="btnBackup" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnBackup_Click" ToolTip="Backup current save" Margin="10,5" TabIndex="1" Grid.Column="0">
-                <DynamicResource ResourceKey="Save"/>
-            </Button>
             <Button x:Name="btnClearBackups" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnClearBackups_Click" ToolTip="Clear unnamed backups" Margin="5,5" TabIndex="1" Grid.Column="1">
                 <DynamicResource ResourceKey="Delete"/>
             </Button>
@@ -136,6 +133,11 @@
                 <Label x:Name="lblStatus" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" ToolTip="Not backed up" Margin="5">
                     <DynamicResource ResourceKey="StatusNo"/>
                 </Label>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Left">
+                <Button x:Name="btnBackup" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnBackup_Click" ToolTip="Backup current save" Margin="10,5" TabIndex="1" Grid.Column="0">
+                    <DynamicResource ResourceKey="Save"/>
+                </Button>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
                 <Label x:Name="lblLastMessage" Content="" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{x:Null}" Foreground="White" Margin="5"/>
