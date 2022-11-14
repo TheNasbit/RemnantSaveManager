@@ -226,5 +226,17 @@ namespace RemnantSaveManager.Properties {
                 this["GameFolder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool KeepNamedBackups {
+            get {
+                return ((bool)(this["KeepNamedBackups"]));
+            }
+            set {
+                this["KeepNamedBackups"] = value;
+            }
+        }
     }
 }

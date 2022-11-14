@@ -11,6 +11,7 @@
         <Image x:Key="PlayGrey" Height="22" Width="22" Source="Resources/Play_grey_32x.png"/>
         <Image x:Key="Save" Height="22" Width="22" Source="Resources/Save_32x.png"/>
         <Image x:Key="SaveGrey" Height="22" Width="22" Source="Resources/Save_grey_32x.png"/>
+        <Image x:Key="Delete" Height="22" Width="22" Source="Resources/Trash_32x.png"/>
         <Image x:Key="Restore" Height="22" Width="22" Source="Resources/Undo_32x.png"/>
         <Image x:Key="RestoreGrey" Height="22" Width="22" Source="Resources/Undo_grey_32x.png"/>
         <Image x:Key="StatusOK" Height="16" Width="16" Source="Resources/StatusOK_32x.png"/>
@@ -49,6 +50,10 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="46"/>
             </Grid.ColumnDefinitions>
+            <Button x:Name="btnClearBackups" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BtnClearBackups_Click" ToolTip="Clear unnamed backups" Margin="5,5" TabIndex="1" Grid.Column="1">
+                <DynamicResource ResourceKey="Delete"/>
+            </Button>
+            <Separator Style="{DynamicResource VerticalSeparatorStyle}" Grid.Column="2" />
             <Button x:Name="btnAnalyzeCurrent" Click="BtnAnalyzeCurrent_Click" ToolTip="Analyze active save" Margin="10,5" TabIndex="3" Grid.Column="3">
                 <Image Height="22" Width="22" Source="Resources/SearchMember_32x.png"/>
             </Button>
@@ -114,6 +119,7 @@
                     <Button x:Name="btnGameFolder" Content="Game Folder" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top" Width="90" Height="23" Click="btnGameFolder_Click"/>
                     <TextBox x:Name="txtGameFolder" Height="23" Margin="105,126,60,0" TextWrapping="Wrap" VerticalAlignment="Top" TabIndex="6" IsTabStop="False" IsReadOnly="True" ToolTip="Where your Remnant game is located"/>
                     <Button x:Name="btnFindGameFolder" Content="Auto" HorizontalAlignment="Right" Margin="10,126,10,0" VerticalAlignment="Top" Width="45" Height="23" Click="btnFindGameFolder_Click"/>
+                    <CheckBox x:Name="chkKeepNamedBackup" Content="Keep named backups" ToolTip="Don't remove named backups" HorizontalAlignment="Left" Margin="280,67,0,0" VerticalAlignment="Top" Click="ChkKeepNamedBackup_Click" TabIndex="101"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="tabLog" Header="Log">
