@@ -108,6 +108,9 @@
     <Compile Include="SaveBackup.cs" />
     <Compile Include="RemnantCharacter.cs" />
     <Compile Include="RemnantWorldEvent.cs" />
+    <Compile Include="SelectWorldDialog.xaml.cs">
+      <DependentUpon>SelectWorldDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowsSave.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -126,6 +129,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SaveAnalyzer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SelectWorldDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

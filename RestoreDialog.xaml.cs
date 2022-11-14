@@ -26,7 +26,7 @@ namespace RemnantSaveManager
             this.Close();
         }
 
-        private void btnWorld_Click(object sender, RoutedEventArgs e)
+        private void btnAllWorlds_Click(object sender, RoutedEventArgs e)
         {
 
             if (this._saveBackup.Save.Characters.Count != this._activeSave.Characters.Count)
@@ -39,6 +39,21 @@ namespace RemnantSaveManager
                     this.Close();
                     return;
                 }
+            }
+
+            Result = "Worlds";
+            DialogResult = true;
+            this.Close();
+        }
+        private void btnWorld_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult confirmResult = MessageBox.Show("Worlds may in different order when characters got deleted. This may result in unexpected behavior. Proceed?",
+                                     "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
+            if (confirmResult == MessageBoxResult.No)
+            {
+                DialogResult = false;
+                this.Close();
+                return;
             }
 
             Result = "World";

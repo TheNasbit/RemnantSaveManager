@@ -37,6 +37,7 @@ namespace RemnantSaveManager
         private List<SaveAnalyzer> backupSaveAnalyzers;
 
         private RestoreDialog restoreDialog;
+        private SelectWorldDialog selectWorldDialog;
 
         private System.Timers.Timer saveTimer;
         private DateTime lastUpdateCheck;
@@ -511,13 +512,32 @@ namespace RemnantSaveManager
                         file.CopyTo($"{saveDirPath}\\{file.Name}");
                     }
                     break;
-                case "World":
+                case "Worlds":
                     foreach (FileInfo file in buDi.GetFiles("save_?.sav"))
                     {
                         FileInfo oldFile = new FileInfo($"{di.FullName}\\{file.Name}");
                         if (oldFile.Exists) oldFile.Delete();
 
                         file.CopyTo($"{saveDirPath}\\{file.Name}");
+                    }
+
+                    break;
+                case "World":
+                    this.selectWorldDialog = new SelectWorldDialog(this, backup, this.activeSave);
+                    this.selectWorldDialog.Owner = this;
+
+                    bool? dialogResult = this.selectWorldDialog.ShowDialog();
+                    if (dialogResult.HasValue && dialogResult.Value == false) return;
+
+                    SelectedWorldResult selectWorldResult = this.selectWorldDialog.Result;
+
+                    FileInfo currentWorld = new FileInfo($"{di.FullName}\\save_{selectWorldResult.SaveWorld}.sav");
+                    FileInfo backupWorld = new FileInfo($"{buDi.FullName}\\save_{selectWorldResult.BackupWorld}.sav");
+
+                    if (currentWorld.Exists && backupWorld.Exists)
+                    {
+                        currentWorld.Delete();
+                        backupWorld.CopyTo($"{saveDirPath}\\save_{selectWorldResult.SaveWorld}.sav");
                     }
                     break;
                 default:
