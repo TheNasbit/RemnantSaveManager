@@ -1,102 +1,97 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Controls.Primitives;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
 
-namespace RemnantSaveManager
+namespace RemnantSaveManager.Remnant.Views
 {
     /// <summary>
     /// Interaction logic for SaveAnalyzer.xaml
     /// </summary>
     public partial class SaveAnalyzer : Window
     {
-        private MainWindow mainWindow;
+        private Manager manager;
         public bool ActiveSave { get; set; }
         private List<RemnantCharacter> listCharacters;
         private AnalyzerColor analyzerColor;
         private Dictionary<string,Dictionary<string,double>> columnWidths;
         private bool initialized;
-        public SaveAnalyzer(MainWindow mw)
+        public SaveAnalyzer(Manager mw)
         {
-            initialized = false;
-            InitializeComponent();
+            this.initialized = false;
+            this.InitializeComponent();
 
-            mainWindow = mw;
+            this.manager = mw;
 
-            listCharacters = new List<RemnantCharacter>();
+            this.listCharacters = new List<RemnantCharacter>();
 
-            cmbCharacter.ItemsSource = listCharacters;
+            this.cmbCharacter.ItemsSource = this.listCharacters;
 
-            analyzerColor = new AnalyzerColor();
-            analyzerColor.backgroundColor = (Color)ColorConverter.ConvertFromString("#343a40");
-            analyzerColor.textColor = (Color)ColorConverter.ConvertFromString("#f8f9fa");
-            analyzerColor.headerBackgroundColor = (Color)ColorConverter.ConvertFromString("#70a1ff");
-            analyzerColor.borderColor = (Color)ColorConverter.ConvertFromString("#dddddd");
+            this.analyzerColor = new AnalyzerColor();
+            this.analyzerColor.backgroundColor = (Color)ColorConverter.ConvertFromString("#343a40");
+            this.analyzerColor.textColor = (Color)ColorConverter.ConvertFromString("#f8f9fa");
+            this.analyzerColor.headerBackgroundColor = (Color)ColorConverter.ConvertFromString("#70a1ff");
+            this.analyzerColor.borderColor = (Color)ColorConverter.ConvertFromString("#dddddd");
 
-            dgCampaign.VerticalGridLinesBrush = new SolidColorBrush(analyzerColor.borderColor);
-            dgCampaign.HorizontalGridLinesBrush = new SolidColorBrush(analyzerColor.borderColor);
-            dgCampaign.RowBackground = new SolidColorBrush(analyzerColor.backgroundColor);
-            dgCampaign.RowHeaderStyle = new Style(typeof(DataGridRowHeader));
-            dgCampaign.RowHeaderStyle.Setters.Add(new Setter(DataGridRowHeader.BackgroundProperty, new SolidColorBrush(analyzerColor.backgroundColor)));
-            dgCampaign.ColumnHeaderStyle = new Style(typeof(DataGridColumnHeader));
-            dgCampaign.ColumnHeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.BackgroundProperty, new SolidColorBrush(analyzerColor.headerBackgroundColor)));
+            this.dgCampaign.VerticalGridLinesBrush = new SolidColorBrush(this.analyzerColor.borderColor);
+            this.dgCampaign.HorizontalGridLinesBrush = new SolidColorBrush(this.analyzerColor.borderColor);
+            this.dgCampaign.RowBackground = new SolidColorBrush(this.analyzerColor.backgroundColor);
+            this.dgCampaign.RowHeaderStyle = new Style(typeof(DataGridRowHeader));
+            this.dgCampaign.RowHeaderStyle.Setters.Add(new Setter(DataGridRowHeader.BackgroundProperty, new SolidColorBrush(this.analyzerColor.backgroundColor)));
+            this.dgCampaign.ColumnHeaderStyle = new Style(typeof(DataGridColumnHeader));
+            this.dgCampaign.ColumnHeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.BackgroundProperty, new SolidColorBrush(this.analyzerColor.headerBackgroundColor)));
 
-            dgAdventure.VerticalGridLinesBrush = new SolidColorBrush(analyzerColor.borderColor);
-            dgAdventure.HorizontalGridLinesBrush = new SolidColorBrush(analyzerColor.borderColor);
-            dgAdventure.RowBackground = new SolidColorBrush(analyzerColor.backgroundColor);
-            dgAdventure.RowHeaderStyle = new Style(typeof(DataGridRowHeader));
-            dgAdventure.RowHeaderStyle.Setters.Add(new Setter(DataGridRowHeader.BackgroundProperty, new SolidColorBrush(analyzerColor.backgroundColor)));
-            dgAdventure.ColumnHeaderStyle = new Style(typeof(DataGridColumnHeader));
-            dgAdventure.ColumnHeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.BackgroundProperty, new SolidColorBrush(analyzerColor.headerBackgroundColor)));
+            this.dgAdventure.VerticalGridLinesBrush = new SolidColorBrush(this.analyzerColor.borderColor);
+            this.dgAdventure.HorizontalGridLinesBrush = new SolidColorBrush(this.analyzerColor.borderColor);
+            this.dgAdventure.RowBackground = new SolidColorBrush(this.analyzerColor.backgroundColor);
+            this.dgAdventure.RowHeaderStyle = new Style(typeof(DataGridRowHeader));
+            this.dgAdventure.RowHeaderStyle.Setters.Add(new Setter(DataGridRowHeader.BackgroundProperty, new SolidColorBrush(this.analyzerColor.backgroundColor)));
+            this.dgAdventure.ColumnHeaderStyle = new Style(typeof(DataGridColumnHeader));
+            this.dgAdventure.ColumnHeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.BackgroundProperty, new SolidColorBrush(this.analyzerColor.headerBackgroundColor)));
 
-            lblCredits.Content = "Thanks to /u/hzla00 for the original online implementation.\n\nLots of code used here was adapted from his original javascript (as was the styling!).";
+            this.lblCredits.Content = "Thanks to /u/hzla00 for the original online implementation.\n\nLots of code used here was adapted from his original javascript (as was the styling!).";
 
-            txtMissingItems.BorderThickness = new Thickness(0);
+            this.txtMissingItems.BorderThickness = new Thickness(0);
 
-            columnWidths = new Dictionary<string, Dictionary<string, double>>();
-            columnWidths.Add(dgCampaign.Name, new Dictionary<string, double>());
-            columnWidths.Add(dgAdventure.Name, new Dictionary<string, double>());
+            this.columnWidths = new Dictionary<string, Dictionary<string, double>>();
+            this.columnWidths.Add(this.dgCampaign.Name, new Dictionary<string, double>());
+            this.columnWidths.Add(this.dgAdventure.Name, new Dictionary<string, double>());
 
-            sliderSize.Value = Properties.Settings.Default.AnalyzerFontSize;
-            treeMissingItems.FontSize = sliderSize.Value - 4;
-            lblCredits.FontSize = sliderSize.Value;
-            initialized = true;
+            this.sliderSize.Value = Properties.Settings.Default.AnalyzerFontSize;
+            this.treeMissingItems.FontSize = this.sliderSize.Value - 4;
+            this.lblCredits.FontSize = this.sliderSize.Value;
+            this.initialized = true;
             TreeViewItem nodeNormal = new TreeViewItem();
             nodeNormal.Header = "Normal";
-            nodeNormal.Foreground = treeMissingItems.Foreground;
+            nodeNormal.Foreground = this.treeMissingItems.Foreground;
             nodeNormal.IsExpanded = Properties.Settings.Default.NormalExpanded;
-            nodeNormal.Expanded += GameType_CollapsedExpanded;
-            nodeNormal.Collapsed += GameType_CollapsedExpanded;
+            nodeNormal.Expanded += this.GameType_CollapsedExpanded;
+            nodeNormal.Collapsed += this.GameType_CollapsedExpanded;
             nodeNormal.Tag = "mode";
             TreeViewItem nodeHardcore = new TreeViewItem();
             nodeHardcore.Header = "Hardcore";
-            nodeHardcore.Foreground = treeMissingItems.Foreground;
+            nodeHardcore.Foreground = this.treeMissingItems.Foreground;
             nodeHardcore.IsExpanded = Properties.Settings.Default.HardcoreExpanded;
-            nodeHardcore.Expanded += GameType_CollapsedExpanded;
-            nodeHardcore.Collapsed += GameType_CollapsedExpanded;
+            nodeHardcore.Expanded += this.GameType_CollapsedExpanded;
+            nodeHardcore.Collapsed += this.GameType_CollapsedExpanded;
             nodeHardcore.Tag = "mode";
             TreeViewItem nodeSurvival = new TreeViewItem();
             nodeSurvival.Header = "Survival";
-            nodeSurvival.Foreground = treeMissingItems.Foreground;
+            nodeSurvival.Foreground = this.treeMissingItems.Foreground;
             nodeSurvival.IsExpanded = Properties.Settings.Default.SurvivalExpanded;
-            nodeSurvival.Expanded += GameType_CollapsedExpanded;
-            nodeSurvival.Collapsed += GameType_CollapsedExpanded;
+            nodeSurvival.Expanded += this.GameType_CollapsedExpanded;
+            nodeSurvival.Collapsed += this.GameType_CollapsedExpanded;
             nodeSurvival.Tag = "mode";
-            treeMissingItems.Items.Add(nodeNormal);
-            treeMissingItems.Items.Add(nodeHardcore);
-            treeMissingItems.Items.Add(nodeSurvival);
+            this.treeMissingItems.Items.Add(nodeNormal);
+            this.treeMissingItems.Items.Add(nodeHardcore);
+            this.treeMissingItems.Items.Add(nodeSurvival);
         }
 
         private void GameType_CollapsedExpanded(object sender, RoutedEventArgs e)
@@ -118,17 +113,17 @@ namespace RemnantSaveManager
 
         public void LoadData(List<RemnantCharacter> chars)
         {
-            int selectedChar = cmbCharacter.SelectedIndex;
-            listCharacters = chars;
+            int selectedChar = this.cmbCharacter.SelectedIndex;
+            this.listCharacters = chars;
             /*Console.WriteLine("Loading characters in analyzer: " + listCharacters.Count);
             foreach (CharacterData cd in listCharacters)
             {
                 Console.WriteLine("\t" + cd);
             }*/
-            cmbCharacter.ItemsSource = listCharacters;
-            if (selectedChar == -1 && listCharacters.Count > 0) selectedChar = 0;
-            if (selectedChar > -1 && listCharacters.Count > selectedChar) cmbCharacter.SelectedIndex = selectedChar;
-            cmbCharacter.IsEnabled = (listCharacters.Count > 1);
+            this.cmbCharacter.ItemsSource = this.listCharacters;
+            if (selectedChar == -1 && this.listCharacters.Count > 0) selectedChar = 0;
+            if (selectedChar > -1 && this.listCharacters.Count > selectedChar) this.cmbCharacter.SelectedIndex = selectedChar;
+            this.cmbCharacter.IsEnabled = (this.listCharacters.Count > 1);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -142,35 +137,35 @@ namespace RemnantSaveManager
 
         private void CmbCharacter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cmbCharacter.SelectedIndex == -1 && listCharacters.Count > 0) return;
-            if (cmbCharacter.Items.Count > 0 && cmbCharacter.SelectedIndex > -1)
+            if (this.cmbCharacter.SelectedIndex == -1 && this.listCharacters.Count > 0) return;
+            if (this.cmbCharacter.Items.Count > 0 && this.cmbCharacter.SelectedIndex > -1)
             {
-                dgCampaign.ItemsSource = listCharacters[cmbCharacter.SelectedIndex].CampaignEvents;
-                if (listCharacters[cmbCharacter.SelectedIndex].AdventureEvents.Count > 0)
+                this.dgCampaign.ItemsSource = this.listCharacters[this.cmbCharacter.SelectedIndex].CampaignEvents;
+                if (this.listCharacters[this.cmbCharacter.SelectedIndex].AdventureEvents.Count > 0)
                 {
-                    ((TabItem)tabAnalyzer.Items[1]).IsEnabled = true;
-                    dgAdventure.ItemsSource = listCharacters[cmbCharacter.SelectedIndex].AdventureEvents;
+                    ((TabItem)this.tabAnalyzer.Items[1]).IsEnabled = true;
+                    this.dgAdventure.ItemsSource = this.listCharacters[this.cmbCharacter.SelectedIndex].AdventureEvents;
 
                 } else
                 {
-                    ((TabItem)tabAnalyzer.Items[1]).IsEnabled = false;
-                    if (tabAnalyzer.SelectedIndex == 1) tabAnalyzer.SelectedIndex = 0;
+                    ((TabItem)this.tabAnalyzer.Items[1]).IsEnabled = false;
+                    if (this.tabAnalyzer.SelectedIndex == 1) this.tabAnalyzer.SelectedIndex = 0;
                 }
-                txtMissingItems.Text = string.Join("\n", listCharacters[cmbCharacter.SelectedIndex].GetMissingItems());
+                this.txtMissingItems.Text = string.Join("\n", this.listCharacters[this.cmbCharacter.SelectedIndex].GetMissingItems());
 
-                foreach (TreeViewItem item in treeMissingItems.Items)
+                foreach (TreeViewItem item in this.treeMissingItems.Items)
                 {
                     item.Items.Clear();
                 }
-                foreach (RemnantItem rItem in listCharacters[cmbCharacter.SelectedIndex].GetMissingItems())
+                foreach (RemnantItem rItem in this.listCharacters[this.cmbCharacter.SelectedIndex].GetMissingItems())
                 {
                     TreeViewItem item = new TreeViewItem();
                     item.Header = rItem.ItemName;
                     if (!rItem.ItemNotes.Equals("")) item.ToolTip = rItem.ItemNotes;
-                    item.Foreground = treeMissingItems.Foreground;
+                    item.Foreground = this.treeMissingItems.Foreground;
                     item.ContextMenu = this.treeMissingItems.Resources["ItemContext"] as System.Windows.Controls.ContextMenu;
                     item.Tag = "item";
-                    TreeViewItem modeNode = ((TreeViewItem)treeMissingItems.Items[(int)rItem.ItemMode]);
+                    TreeViewItem modeNode = ((TreeViewItem)this.treeMissingItems.Items[(int)rItem.ItemMode]);
                     TreeViewItem itemTypeNode = null;
                     foreach (TreeViewItem typeNode in modeNode.Items)
                     {
@@ -184,11 +179,11 @@ namespace RemnantSaveManager
                     {
                         itemTypeNode = new TreeViewItem();
                         itemTypeNode.Header = rItem.ItemType;
-                        itemTypeNode.Foreground = treeMissingItems.Foreground;
+                        itemTypeNode.Foreground = this.treeMissingItems.Foreground;
                         itemTypeNode.IsExpanded = true;
                         itemTypeNode.ContextMenu = this.treeMissingItems.Resources["ItemGroupContext"] as System.Windows.Controls.ContextMenu;
                         itemTypeNode.Tag = "type";
-                        ((TreeViewItem)treeMissingItems.Items[(int)rItem.ItemMode]).Items.Add(itemTypeNode);
+                        ((TreeViewItem)this.treeMissingItems.Items[(int)rItem.ItemMode]).Items.Add(itemTypeNode);
                     }
                     itemTypeNode.Items.Add(item);
                 }
@@ -201,7 +196,7 @@ namespace RemnantSaveManager
         }
 
         private void logMessage(string message) {
-            mainWindow.logMessage(this.Title+": "+message);
+            this.manager.logMessage(this.Title+": "+message);
         }
 
         struct AnalyzerColor
@@ -213,18 +208,18 @@ namespace RemnantSaveManager
         }
         private void autoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
         {
-            double fontSize = sliderSize.Value;
+            double fontSize = this.sliderSize.Value;
             e.Column.HeaderStyle = new Style(typeof(DataGridColumnHeader));
-            e.Column.HeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.BackgroundProperty, new SolidColorBrush(analyzerColor.headerBackgroundColor)));
+            e.Column.HeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.BackgroundProperty, new SolidColorBrush(this.analyzerColor.headerBackgroundColor)));
             e.Column.HeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.ForegroundProperty, new SolidColorBrush(Colors.White)));
             e.Column.HeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.PaddingProperty, new Thickness(8,4,8,4)));
             e.Column.HeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.FontSizeProperty, fontSize));
             e.Column.HeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.FontWeightProperty, FontWeights.Bold));
-            e.Column.HeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.BorderBrushProperty, new SolidColorBrush(analyzerColor.borderColor)));
+            e.Column.HeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.BorderBrushProperty, new SolidColorBrush(this.analyzerColor.borderColor)));
             e.Column.HeaderStyle.Setters.Add(new Setter(DataGridColumnHeader.BorderThicknessProperty, new Thickness(1)));
 
             e.Column.CellStyle = new Style(typeof(DataGridCell));
-            e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.BackgroundProperty, new SolidColorBrush(analyzerColor.backgroundColor)));
+            e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.BackgroundProperty, new SolidColorBrush(this.analyzerColor.backgroundColor)));
             e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.PaddingProperty, new Thickness(4)));
             //e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.BorderBrushProperty, new SolidColorBrush(borderColor)));
             //e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.BorderThicknessProperty, new Thickness(1)));
@@ -237,7 +232,7 @@ namespace RemnantSaveManager
                     e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new SolidColorBrush(Colors.Red)));
                 } else
                 {
-                    e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new SolidColorBrush(analyzerColor.textColor)));
+                    e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new SolidColorBrush(this.analyzerColor.textColor)));
                 }
             } else if (e.Column.Header.Equals("PossibleItems"))
             {
@@ -254,13 +249,13 @@ namespace RemnantSaveManager
                 }
                 else
                 {
-                    e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new SolidColorBrush(analyzerColor.textColor)));
+                    e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new SolidColorBrush(this.analyzerColor.textColor)));
                 }
             }
             else
             {
                 e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.FontSizeProperty, fontSize));
-                e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new SolidColorBrush(analyzerColor.textColor)));
+                e.Column.CellStyle.Setters.Add(new Setter(DataGridCell.ForegroundProperty, new SolidColorBrush(this.analyzerColor.textColor)));
             }
 
             /*DataGrid dg = (DataGrid)sender;
@@ -280,11 +275,11 @@ namespace RemnantSaveManager
 
         private void dgCampaign_LayoutUpdated(object sender, EventArgs e)
         {
-            saveColumnWidth(dgCampaign);
+            this.saveColumnWidth(this.dgCampaign);
         }
         private void dgAdventure_LayoutUpdated(object sender, EventArgs e)
         {
-            saveColumnWidth(dgAdventure);
+            this.saveColumnWidth(this.dgAdventure);
         }
 
         private void saveColumnWidth(DataGrid dg)
@@ -322,16 +317,16 @@ namespace RemnantSaveManager
 
         private void sliderSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (initialized)
+            if (this.initialized)
             {
-                Properties.Settings.Default.AnalyzerFontSize = sliderSize.Value;
+                Properties.Settings.Default.AnalyzerFontSize = this.sliderSize.Value;
                 Properties.Settings.Default.Save();
 
-                dgCampaign.ItemsSource = null;
-                dgAdventure.ItemsSource = null;
-                CmbCharacter_SelectionChanged(null, null);
-                treeMissingItems.FontSize = sliderSize.Value - 4;
-                lblCredits.FontSize = sliderSize.Value;
+                this.dgCampaign.ItemsSource = null;
+                this.dgAdventure.ItemsSource = null;
+                this.CmbCharacter_SelectionChanged(null, null);
+                this.treeMissingItems.FontSize = this.sliderSize.Value - 4;
+                this.lblCredits.FontSize = this.sliderSize.Value;
             }
 
         }
@@ -339,7 +334,7 @@ namespace RemnantSaveManager
         private void btnExport_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.SaveFileDialog saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            string name = (string)((TabItem)tabAnalyzer.SelectedItem).Header;
+            string name = (string)((TabItem)this.tabAnalyzer.SelectedItem).Header;
             saveFileDialog.FileName = name + ".md";
             System.Windows.Forms.DialogResult result = saveFileDialog.ShowDialog();
             if (result == System.Windows.Forms.DialogResult.OK)
@@ -347,19 +342,19 @@ namespace RemnantSaveManager
                 using (System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile())
                 using (System.IO.StreamWriter sw = new StreamWriter(fs))
                 {
-                    switch (tabAnalyzer.SelectedIndex)
+                    switch (this.tabAnalyzer.SelectedIndex)
                     {
                         case 0:
-                            sw.Write(ExportCampaign(isAdventure: false));
+                            sw.Write(this.ExportCampaign(isAdventure: false));
                             break;
                         case 1:
-                            sw.Write(ExportCampaign(isAdventure: true));
+                            sw.Write(this.ExportCampaign(isAdventure: true));
                             break;
                         case 3:
-                            sw.Write(ExportMissingItems());
+                            sw.Write(this.ExportMissingItems());
                             break;
                         case 4:
-                            sw.Write(ExportCredits());
+                            sw.Write(this.ExportCredits());
                             break;
                         default:
                             throw new Exception("Tab does not exist");
@@ -393,10 +388,10 @@ namespace RemnantSaveManager
             {
                 sb.AppendLine($"##### {eItem.Name}");
                 sb.AppendLine($"- **Type** - {eItem.Type}");
-                sb.Append(FormatItems("Missing Items", eItem.MissingItems));
+                sb.Append(this.FormatItems("Missing Items", eItem.MissingItems));
                 if (Properties.Settings.Default.ShowPossibleItems)
                 {
-                    sb.Append(FormatItems("Possible Items", eItem.PossibleItems));
+                    sb.Append(this.FormatItems("Possible Items", eItem.PossibleItems));
                 }
             }
             return sb.ToString();
@@ -406,21 +401,21 @@ namespace RemnantSaveManager
             StringBuilder sb = new StringBuilder();
 
             List<RemnantWorldEvent> events = isAdventure ?
-                listCharacters[cmbCharacter.SelectedIndex].AdventureEvents :
-                listCharacters[cmbCharacter.SelectedIndex].CampaignEvents;
+                this.listCharacters[this.cmbCharacter.SelectedIndex].AdventureEvents :
+                this.listCharacters[this.cmbCharacter.SelectedIndex].CampaignEvents;
             foreach(var region in events.GroupBy(x => x.Location.Split(':')[0].Trim()))
             {
                 sb.AppendLine();
                 sb.AppendLine($"## {region.Key}");
-                sb.Append(DumpEvents(region.Where(x => x.Location.Split(':').Length == 1)));
+                sb.Append(this.DumpEvents(region.Where(x => x.Location.Split(':').Length == 1)));
                 foreach (var zone in region.Where(x=>x.Location.Split(':').Length > 1).GroupBy(x => x.Location.Split(':')[1].Trim()))
                 {
                     sb.AppendLine($"### {zone.Key}");
-                    sb.Append(DumpEvents(zone.Where(x => x.Location.Split(':').Length == 2)));
+                    sb.Append(this.DumpEvents(zone.Where(x => x.Location.Split(':').Length == 2)));
                     foreach (var locality in zone.Where(x => x.Location.Split(':').Length > 2).GroupBy(x => x.Location.Split(':')[2].Trim()))
                     {
                         sb.AppendLine($"#### {locality.Key}");
-                        sb.Append(DumpEvents(locality));
+                        sb.Append(this.DumpEvents(locality));
                     }
                 }
             }
@@ -429,7 +424,7 @@ namespace RemnantSaveManager
         private string ExportMissingItems()
         {
             StringBuilder sb = new StringBuilder();
-            foreach(var mode in listCharacters[cmbCharacter.SelectedIndex].GetMissingItems().GroupBy(x => x.ItemMode))
+            foreach(var mode in this.listCharacters[this.cmbCharacter.SelectedIndex].GetMissingItems().GroupBy(x => x.ItemMode))
             {
                 sb.AppendLine($"## {mode.Key}");
                 foreach(var type in mode.GroupBy(x=> x.ItemType))
@@ -452,24 +447,24 @@ namespace RemnantSaveManager
         }
         private string ExportCredits()
         {
-            return (string)lblCredits.Content;
+            return (string)this.lblCredits.Content;
         }
 
         private void btnCopy_Click(object sender, RoutedEventArgs e)
         {
-            switch (tabAnalyzer.SelectedIndex)
+            switch (this.tabAnalyzer.SelectedIndex)
             {
                 case 0:
-                    Clipboard.SetText(ExportCampaign(isAdventure: false));
+                    Clipboard.SetText(this.ExportCampaign(isAdventure: false));
                     break;
                 case 1:
-                    Clipboard.SetText(ExportCampaign(isAdventure: true));
+                    Clipboard.SetText(this.ExportCampaign(isAdventure: true));
                     break;
                 case 3:
-                    Clipboard.SetText(ExportMissingItems());
+                    Clipboard.SetText(this.ExportMissingItems());
                     break;
                 case 4:
-                    Clipboard.SetText(ExportCredits());
+                    Clipboard.SetText(this.ExportCredits());
                     break;
                 default:
                     throw new Exception("Tab does not exist");
@@ -485,7 +480,7 @@ namespace RemnantSaveManager
             sb.AppendLine(item.Header.ToString() + ":");
             foreach (TreeViewItem i in item.Items)
             {
-                sb.AppendLine("\t- " + GetTreeItem(i));
+                sb.AppendLine("\t- " + this.GetTreeItem(i));
             }
             return sb.ToString();
         }
@@ -495,7 +490,7 @@ namespace RemnantSaveManager
             MenuItem mnu = sender as MenuItem;
             TreeViewItem treeItem = ((ContextMenu)mnu?.Parent)?.PlacementTarget as TreeViewItem;
 
-            Clipboard.SetText(GetTreeItem(treeItem));
+            Clipboard.SetText(this.GetTreeItem(treeItem));
         }
 
         private void SearchItem_Click(object sender, RoutedEventArgs e)

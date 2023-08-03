@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 using System.IO;
+using System.Text.RegularExpressions;
 
-namespace RemnantSaveManager
+namespace RemnantSaveManager.Remnant
 {
     public class RemnantCharacter
     {
@@ -99,21 +96,21 @@ namespace RemnantSaveManager
                 RemnantWorldEvent.ProcessEvents(this, advtext, RemnantWorldEvent.ProcessMode.Adventure);
             }
 
-            missingItems.Clear();
+            this.missingItems.Clear();
             foreach (RemnantItem[] eventItems in GameInfo.EventItem.Values)
             {
                 foreach (RemnantItem item in eventItems)
                 {
                     if (!this.Inventory.Contains(item.GetKey()))
                     {
-                        if (!missingItems.Contains(item))
+                        if (!this.missingItems.Contains(item))
                         {
-                            missingItems.Add(item);
+                            this.missingItems.Add(item);
                         }
                     }
                 }
             }
-            missingItems.Sort();
+            this.missingItems.Sort();
         }
 
         public enum CharacterProcessingMode { All, NoEvents };
@@ -251,7 +248,7 @@ namespace RemnantSaveManager
                             {
                                 Console.WriteLine("Save file in use; waiting 0.5 seconds and retrying.");
                                 System.Threading.Thread.Sleep(500);
-                                LoadWorldData(charIndex);
+                                this.LoadWorldData(charIndex);
                             }
                         }
                         catch (Exception ex)
@@ -267,7 +264,7 @@ namespace RemnantSaveManager
 
         public List<RemnantItem> GetMissingItems()
         {
-            return missingItems;
+            return this.missingItems;
         }
     }
 }

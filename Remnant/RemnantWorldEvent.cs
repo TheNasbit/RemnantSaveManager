@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
-using System.Xml;
-using System.Net;
-using System.Diagnostics;
 
-namespace RemnantSaveManager
+namespace RemnantSaveManager.Remnant
 {
     public class RemnantWorldEvent
     {
@@ -19,7 +13,7 @@ namespace RemnantSaveManager
         public string Name { get; set; }
         public string MissingItems {
             get {
-                return string.Join("\n", mItems);
+                return string.Join("\n", this.mItems);
             }
         }
         public string PossibleItems
@@ -33,7 +27,7 @@ namespace RemnantSaveManager
 
         public string getKey()
         {
-            return eventKey;
+            return this.eventKey;
         }
 
         public void setKey(string key)
@@ -62,12 +56,12 @@ namespace RemnantSaveManager
                     missingItems.Add(item);
                 }
             }
-            mItems = missingItems;
+            this.mItems = missingItems;
 
             if (possibleItems.Count == 0 && !GameInfo.Events.ContainsKey(this.getKey()) && !this.getKey().Equals("TraitBook") && !this.getKey().Equals("Simulacrum"))
             {
                 RemnantItem ri = new RemnantItem("/UnknownPotentialLoot");
-                mItems.Add(ri);
+                this.mItems.Add(ri);
             }
         }
 
@@ -109,9 +103,9 @@ namespace RemnantSaveManager
                         if (currentSublocation.Equals("TheRavager'sHaunt") || currentSublocation.Equals("TheTempestCourt")) currentSublocation = null;
                     }
                     zone = getZone(textLine);
-                    
+
                     eventType = getEventType(textLine);
-                    
+
                     if (textLine.Contains("Overworld_Zone") || textLine.Contains("_Overworld_"))
                     {
                         //process overworld zone marker

@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-namespace RemnantSaveManager
+namespace RemnantSaveManager.Remnant.Views
 {
     /// <summary>
     /// Interaction logic for SelectWorldDialog.xaml
@@ -23,9 +12,9 @@ namespace RemnantSaveManager
         private SaveBackup _saveBackup;
         private RemnantSave _activeSave;
         public SelectedWorldResult Result { get; set; }
-        public SelectWorldDialog(MainWindow @mw, SaveBackup @sb, RemnantSave @as)
+        public SelectWorldDialog(Manager @mw, SaveBackup @sb, RemnantSave @as)
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.txtSave.Content = $"Save Name:\t{sb.Name}\nSave Date:\t{sb.SaveDate.ToString(CultureInfo.CurrentCulture)}";
             this._saveBackup = sb;
             this._activeSave = @as;
@@ -36,12 +25,12 @@ namespace RemnantSaveManager
 
         private void btnRestore_Click(object sender, RoutedEventArgs e)
         {
-            Result = new SelectedWorldResult();
+            this.Result = new SelectedWorldResult();
 
-            Result.BackupWorld = this.listSave.SelectedIndex;
-            Result.SaveWorld = this.listCurrent.SelectedIndex;
+            this.Result.BackupWorld = this.listSave.SelectedIndex;
+            this.Result.SaveWorld = this.listCurrent.SelectedIndex;
 
-            DialogResult = true;
+            this.DialogResult = true;
             this.Close();
         }
 

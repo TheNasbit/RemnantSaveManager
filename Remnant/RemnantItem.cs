@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
-namespace RemnantSaveManager
+namespace RemnantSaveManager.Remnant
 {
     public class RemnantItem : IEquatable<Object>, IComparable
     {
@@ -20,64 +16,64 @@ namespace RemnantSaveManager
         private string itemType;
         private string itemName;
         private string itemAltName;
-        private string ItemKey { 
-            get { return itemKey; } 
-            set 
+        private string ItemKey {
+            get { return this.itemKey; }
+            set
             {
                 try
                 {
-                    itemKey = value;
-                    itemType = "Uncategorized";
-                    itemName = itemKey.Substring(itemKey.LastIndexOf('/') + 1);
-                    if (itemKey.Contains("/Weapons/"))
+                    this.itemKey = value;
+                    this.itemType = "Uncategorized";
+                    this.itemName = this.itemKey.Substring(this.itemKey.LastIndexOf('/') + 1);
+                    if (this.itemKey.Contains("/Weapons/"))
                     {
-                        itemType = "Weapon";
-                        if (itemName.Contains("Mod_")) itemName = itemName.Replace("/Weapons/", "/Mods/");
+                        this.itemType = "Weapon";
+                        if (this.itemName.Contains("Mod_")) this.itemName = this.itemName.Replace("/Weapons/", "/Mods/");
                     }
-                    if (itemKey.Contains("/Armor/") || itemKey.Contains("TwistedMask"))
+                    if (this.itemKey.Contains("/Armor/") || this.itemKey.Contains("TwistedMask"))
                     {
-                        itemType = "Armor";
-                        if (itemKey.Contains("TwistedMask"))
+                        this.itemType = "Armor";
+                        if (this.itemKey.Contains("TwistedMask"))
                         {
-                            itemName = "TwistedMask (Head)";
+                            this.itemName = "TwistedMask (Head)";
                         }
                         else
                         {
-                            string[] parts = itemName.Split('_');
-                            itemName = parts[2] + " (" + parts[1] + ")";
+                            string[] parts = this.itemName.Split('_');
+                            this.itemName = parts[2] + " (" + parts[1] + ")";
                         }
                     }
-                    if (itemKey.Contains("/Trinkets/") || itemKey.Contains("BrabusPocketWatch")) itemType = "Trinket";
-                    if (itemKey.Contains("/Mods/")) itemType = "Mod";
-                    if (itemKey.Contains("/Traits/")) itemType = "Trait";
-                    if (itemKey.Contains("/Emotes/")) itemType = "Emote";
+                    if (this.itemKey.Contains("/Trinkets/") || this.itemKey.Contains("BrabusPocketWatch")) this.itemType = "Trinket";
+                    if (this.itemKey.Contains("/Mods/")) this.itemType = "Mod";
+                    if (this.itemKey.Contains("/Traits/")) this.itemType = "Trait";
+                    if (this.itemKey.Contains("/Emotes/")) this.itemType = "Emote";
 
-                    itemName = itemName.Replace("Weapon_", "").Replace("Root_", "").Replace("Wasteland_", "").Replace("Swamp_", "").Replace("Pan_", "").Replace("Atoll_", "").Replace("Mod_", "").Replace("Trinket_", "").Replace("Trait_", "").Replace("Quest_", "").Replace("Emote_", "").Replace("Rural_", "").Replace("Snow_", "");
-                    if (!itemType.Equals("Armor"))
+                    this.itemName = this.itemName.Replace("Weapon_", "").Replace("Root_", "").Replace("Wasteland_", "").Replace("Swamp_", "").Replace("Pan_", "").Replace("Atoll_", "").Replace("Mod_", "").Replace("Trinket_", "").Replace("Trait_", "").Replace("Quest_", "").Replace("Emote_", "").Replace("Rural_", "").Replace("Snow_", "");
+                    if (!this.itemType.Equals("Armor"))
                     {
-                        itemName = Regex.Replace(itemName, "([a-z])([A-Z])", "$1 $2");
+                        this.itemName = Regex.Replace(this.itemName, "([a-z])([A-Z])", "$1 $2");
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Error processing item name: " + ex.Message);
-                    itemName = value;
+                    this.itemName = value;
                 }
-            } 
+            }
         }
 
-        public string ItemName 
-        { 
-            get 
+        public string ItemName
+        {
+            get
             {
-                if (itemAltName != null) return itemAltName;
-                return itemName; 
-            } 
+                if (this.itemAltName != null) return this.itemAltName;
+                return this.itemName;
+            }
         }
-        public string ItemType { get { return itemType; } }
+        public string ItemType { get { return this.itemType; } }
         public RemnantItemMode ItemMode { get; set; }
         public string ItemNotes { get; set; }
-        public string ItemAltName { get { return itemAltName; } set { itemAltName = value; } }
+        public string ItemAltName { get { return this.itemAltName; } set { this.itemAltName = value; } }
 
         public RemnantItem(string key)
         {
@@ -100,7 +96,7 @@ namespace RemnantSaveManager
 
         public override string ToString()
         {
-            return itemType + ": " + ItemName;
+            return this.itemType + ": " + this.ItemName;
         }
 
         public override bool Equals(Object obj)

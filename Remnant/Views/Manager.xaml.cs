@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.IO;
-using System.Diagnostics;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Net;
 
-namespace RemnantSaveManager
+namespace RemnantSaveManager.Remnant.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for Manager.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Manager : Window
     {
         private static string defaultBackupFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Remnant\\Saved\\Backups";
         private static string backupDirPath;
@@ -52,10 +51,10 @@ namespace RemnantSaveManager
 
         private bool ActiveSaveIsBackedUp {
             get {
-                DateTime saveDate = File.GetLastWriteTime(activeSave.SaveProfilePath);
-                for (int i = 0; i < listBackups.Count; i++)
+                DateTime saveDate = File.GetLastWriteTime(this.activeSave.SaveProfilePath);
+                for (int i = 0; i < this.listBackups.Count; i++)
                 {
-                    DateTime backupDate = listBackups.ToArray()[i].SaveDate;
+                    DateTime backupDate = this.listBackups.ToArray()[i].SaveDate;
                     if (saveDate.Equals(backupDate))
                     {
                         return true;
@@ -67,31 +66,31 @@ namespace RemnantSaveManager
             {
                 if (value)
                 {
-                    lblStatus.ToolTip = "Backed Up";
-                    lblStatus.Content = FindResource("StatusOK");
-                    btnBackup.IsEnabled = false;
-                    btnBackup.Content = FindResource("SaveGrey");
+                    this.lblStatus.ToolTip = "Backed Up";
+                    this.lblStatus.Content = this.FindResource("StatusOK");
+                    this.btnBackup.IsEnabled = false;
+                    this.btnBackup.Content = this.FindResource("SaveGrey");
                 }
                 else
                 {
-                    lblStatus.ToolTip = "Not Backed Up";
-                    lblStatus.Content = FindResource("StatusNo");
-                    btnBackup.IsEnabled = true;
-                    btnBackup.Content = FindResource("Save");
+                    this.lblStatus.ToolTip = "Not Backed Up";
+                    this.lblStatus.Content = this.FindResource("StatusNo");
+                    this.btnBackup.IsEnabled = true;
+                    this.btnBackup.Content = this.FindResource("Save");
                 }
             }
         }
 
-        public MainWindow()
+        public Manager()
         {
             InitializeComponent();
-            suppressLog = false;
-            txtLog.Text = "Version " + typeof(MainWindow).Assembly.GetName().Version;
+            this.suppressLog = false;
+            this.txtLog.Text = "Version " + typeof(Manager).Assembly.GetName().Version;
             if (Properties.Settings.Default.CreateLogFile)
             {
-                System.IO.File.WriteAllText("log.txt", DateTime.Now.ToString() + ": Version " + typeof(MainWindow).Assembly.GetName().Version + "\r\n");
+                System.IO.File.WriteAllText("log.txt", DateTime.Now.ToString() + ": Version " + typeof(Manager).Assembly.GetName().Version + "\r\n");
             }
-            logMessage("Loading...");
+            this.logMessage("Loading...");
             if (Properties.Settings.Default.UpgradeRequired)
             {
                 Properties.Settings.Default.Upgrade();
@@ -101,7 +100,7 @@ namespace RemnantSaveManager
 
             if (Properties.Settings.Default.SaveFolder.Length == 0)
             {
-                logMessage("Save folder not set; reverting to default.");
+                this.logMessage("Save folder not set; reverting to default.");
                 Properties.Settings.Default.SaveFolder = defaultSaveFolder;
                 if (!Directory.Exists(defaultSaveFolder))
                 {
@@ -122,35 +121,35 @@ namespace RemnantSaveManager
             }
             else if (!Directory.Exists(Properties.Settings.Default.SaveFolder) && !Properties.Settings.Default.SaveFolder.Equals(defaultSaveFolder))
             {
-                logMessage("Save folder (" + Properties.Settings.Default.SaveFolder + ") not found; reverting to default.");
+                this.logMessage("Save folder (" + Properties.Settings.Default.SaveFolder + ") not found; reverting to default.");
                 Properties.Settings.Default.SaveFolder = defaultSaveFolder;
                 Properties.Settings.Default.Save();
             }
             if (Properties.Settings.Default.BackupFolder.Length == 0)
             {
-                logMessage("Backup folder not set; reverting to default.");
+                this.logMessage("Backup folder not set; reverting to default.");
                 Properties.Settings.Default.BackupFolder = defaultBackupFolder;
                 Properties.Settings.Default.Save();
             }
             else if (!Directory.Exists(Properties.Settings.Default.BackupFolder) && !Properties.Settings.Default.BackupFolder.Equals(defaultBackupFolder))
             {
-                logMessage("Backup folder ("+ Properties.Settings.Default.BackupFolder + ") not found; reverting to default.");
+                this.logMessage("Backup folder ("+ Properties.Settings.Default.BackupFolder + ") not found; reverting to default.");
                 Properties.Settings.Default.BackupFolder = defaultBackupFolder;
                 Properties.Settings.Default.Save();
             }
             saveDirPath = Properties.Settings.Default.SaveFolder;
             if (!Directory.Exists(saveDirPath))
             {
-                logMessage("Save folder not found, creating...");
+                this.logMessage("Save folder not found, creating...");
                 Directory.CreateDirectory(saveDirPath);
             }
-            txtSaveFolder.Text = saveDirPath;
+            this.txtSaveFolder.Text = saveDirPath;
 
             gameDirPath = Properties.Settings.Default.GameFolder;
             this.txtGameFolder.Text = gameDirPath;
             if (!Directory.Exists(gameDirPath))
             {
-                logMessage("Game folder not found...");
+                this.logMessage("Game folder not found...");
                 this.btnStartGame.IsEnabled = false;
                 this.btnStartGame.Content = this.FindResource("PlayGrey");
                 this.backupCMStart.IsEnabled = false;
@@ -162,85 +161,85 @@ namespace RemnantSaveManager
             }
 
             backupDirPath = Properties.Settings.Default.BackupFolder;
-            txtBackupFolder.Text = backupDirPath;
+            this.txtBackupFolder.Text = backupDirPath;
 
-            chkCreateLogFile.IsChecked = Properties.Settings.Default.CreateLogFile;
+            this.chkCreateLogFile.IsChecked = Properties.Settings.Default.CreateLogFile;
 
-            chkKeepNamedBackup.IsChecked = Properties.Settings.Default.KeepNamedBackups;
+            this.chkKeepNamedBackup.IsChecked = Properties.Settings.Default.KeepNamedBackups;
 
-            saveTimer = new System.Timers.Timer();
-            saveTimer.Interval = 2000;
-            saveTimer.AutoReset = false;
-            saveTimer.Elapsed += OnSaveTimerElapsed;
+            this.saveTimer = new System.Timers.Timer();
+            this.saveTimer.Interval = 2000;
+            this.saveTimer.AutoReset = false;
+            this.saveTimer.Elapsed += this.OnSaveTimerElapsed;
 
-            saveWatcher = new FileSystemWatcher();
-            saveWatcher.Path = saveDirPath;
+            this.saveWatcher = new FileSystemWatcher();
+            this.saveWatcher.Path = saveDirPath;
 
             // Watch for changes in LastWrite times.
-            saveWatcher.NotifyFilter = NotifyFilters.LastWrite;
+            this.saveWatcher.NotifyFilter = NotifyFilters.LastWrite;
 
             // Only watch sav files.
-            activeSave = new RemnantSave(saveDirPath);
-            if (activeSave.SaveType == RemnantSaveType.Normal)
+            this.activeSave = new RemnantSave(saveDirPath);
+            if (this.activeSave.SaveType == RemnantSaveType.Normal)
             {
-                saveWatcher.Filter = "profile.sav";
+                this.saveWatcher.Filter = "profile.sav";
             }
             else
             {
-                saveWatcher.Filter = "container.*";
+                this.saveWatcher.Filter = "container.*";
             }
 
             // Add event handlers.
-            saveWatcher.Changed += OnSaveFileChanged;
-            saveWatcher.Created += OnSaveFileChanged;
-            saveWatcher.Deleted += OnSaveFileChanged;
+            this.saveWatcher.Changed += this.OnSaveFileChanged;
+            this.saveWatcher.Created += this.OnSaveFileChanged;
+            this.saveWatcher.Deleted += this.OnSaveFileChanged;
             //watcher.Renamed += OnRenamed;
 
-            listBackups = new List<SaveBackup>();
+            this.listBackups = new List<SaveBackup>();
 
-            activeSaveAnalyzer = new SaveAnalyzer(this)
+            this.activeSaveAnalyzer = new SaveAnalyzer(this)
             {
                 ActiveSave = true,
                 Title = "Active Save World Analyzer"
             };
-            backupSaveAnalyzers = new List<SaveAnalyzer>();
+            this.backupSaveAnalyzers = new List<SaveAnalyzer>();
 
-            GameInfo.GameInfoUpdate += OnGameInfoUpdate;
-            dataBackups.CanUserDeleteRows = false;
-            saveCount = 0;
+            GameInfo.GameInfoUpdate += this.OnGameInfoUpdate;
+            this.dataBackups.CanUserDeleteRows = false;
+            this.saveCount = 0;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            txtLog.IsReadOnly = true;
-            logMessage("Current save date: " + File.GetLastWriteTime(activeSave.SaveProfilePath).ToString());
+            this.txtLog.IsReadOnly = true;
+            this.logMessage("Current save date: " + File.GetLastWriteTime(this.activeSave.SaveProfilePath).ToString());
             //logMessage("Backups folder: " + backupDirPath);
             //logMessage("Save folder: " + saveDirPath);
-            loadBackups();
+            this.loadBackups();
             bool autoBackup = Properties.Settings.Default.AutoBackup;
-            chkAutoBackup.IsChecked = autoBackup;
-            txtBackupMins.Text = Properties.Settings.Default.BackupMinutes.ToString();
-            txtBackupLimit.Text = Properties.Settings.Default.BackupLimit.ToString();
-            chkShowPossibleItems.IsChecked = Properties.Settings.Default.ShowPossibleItems;
-            chkAutoCheckUpdate.IsChecked = Properties.Settings.Default.AutoCheckUpdate;
+            this.chkAutoBackup.IsChecked = autoBackup;
+            this.txtBackupMins.Text = Properties.Settings.Default.BackupMinutes.ToString();
+            this.txtBackupLimit.Text = Properties.Settings.Default.BackupLimit.ToString();
+            this.chkShowPossibleItems.IsChecked = Properties.Settings.Default.ShowPossibleItems;
+            this.chkAutoCheckUpdate.IsChecked = Properties.Settings.Default.AutoCheckUpdate;
 
-            cmbMissingItemColor.Items.Add("Red");
-            cmbMissingItemColor.Items.Add("White");
+            this.cmbMissingItemColor.Items.Add("Red");
+            this.cmbMissingItemColor.Items.Add("White");
             if (Properties.Settings.Default.MissingItemColor.ToString().Equals("Red"))
             {
-                cmbMissingItemColor.SelectedIndex = 0;
+                this.cmbMissingItemColor.SelectedIndex = 0;
             } else
             {
-                cmbMissingItemColor.SelectedIndex = 1;
+                this.cmbMissingItemColor.SelectedIndex = 1;
             }
-            cmbMissingItemColor.SelectionChanged += cmbMissingItemColorSelectionChanged;
+            this.cmbMissingItemColor.SelectionChanged += this.cmbMissingItemColorSelectionChanged;
 
-            saveWatcher.EnableRaisingEvents = true;
-            updateCurrentWorldAnalyzer();
+            this.saveWatcher.EnableRaisingEvents = true;
+            this.updateCurrentWorldAnalyzer();
 
             if (Properties.Settings.Default.AutoCheckUpdate)
             {
-                checkForUpdate();
+                this.checkForUpdate();
             }
         }
 
@@ -248,13 +247,13 @@ namespace RemnantSaveManager
         {
             if (!Directory.Exists(backupDirPath))
             {
-                logMessage("Backups folder not found, creating...");
+                this.logMessage("Backups folder not found, creating...");
                 Directory.CreateDirectory(backupDirPath);
             }
-            dataBackups.ItemsSource = null;
-            listBackups.Clear();
-            Dictionary<long, string> backupNames = getSavedBackupNames();
-            Dictionary<long, bool> backupKeeps = getSavedBackupKeeps();
+            this.dataBackups.ItemsSource = null;
+            this.listBackups.Clear();
+            Dictionary<long, string> backupNames = this.getSavedBackupNames();
+            Dictionary<long, bool> backupKeeps = this.getSavedBackupKeeps();
             string[] files = Directory.GetDirectories(backupDirPath);
             SaveBackup activeBackup = null;
             for (int i = 0; i < files.Length; i++)
@@ -271,53 +270,53 @@ namespace RemnantSaveManager
                         backup.Keep = backupKeeps[backup.SaveDate.Ticks];
                     }
 
-                    if (backupActive(backup))
+                    if (this.backupActive(backup))
                     {
                         backup.Active = true;
                         activeBackup = backup;
                     }
 
-                    backup.Updated += saveUpdated;
+                    backup.Updated += this.saveUpdated;
 
-                    listBackups.Add(backup);
+                    this.listBackups.Add(backup);
                 }
             }
-            dataBackups.ItemsSource = listBackups;
-            logMessage("Backups found: " + listBackups.Count);
-            if (listBackups.Count > 0)
+            this.dataBackups.ItemsSource = this.listBackups;
+            this.logMessage("Backups found: " + this.listBackups.Count);
+            if (this.listBackups.Count > 0)
             {
-                logMessage("Last backup save date: " + listBackups[listBackups.Count - 1].SaveDate.ToString());
+                this.logMessage("Last backup save date: " + this.listBackups[this.listBackups.Count - 1].SaveDate.ToString());
             }
             if (activeBackup != null)
             {
-                dataBackups.SelectedItem = activeBackup;
+                this.dataBackups.SelectedItem = activeBackup;
             }
-            ActiveSaveIsBackedUp = (activeBackup != null);
+            this.ActiveSaveIsBackedUp = (activeBackup != null);
         }
 
         private void saveUpdated(object sender, UpdatedEventArgs args)
         {
             if (args.FieldName.Equals("Name"))
             {
-                updateSavedNames();
+                this.updateSavedNames();
             }
             else if (args.FieldName.Equals("Keep"))
             {
-                updateSavedKeeps();
+                this.updateSavedKeeps();
             }
         }
 
         private void loadBackups(Boolean verbose)
         {
-            Boolean oldVal = suppressLog;
-            suppressLog = !verbose;
-            loadBackups();
-            suppressLog = oldVal;
+            Boolean oldVal = this.suppressLog;
+            this.suppressLog = !verbose;
+            this.loadBackups();
+            this.suppressLog = oldVal;
         }
 
         private Boolean backupActive(SaveBackup saveBackup)
         {
-            if (DateTime.Compare(saveBackup.SaveDate, File.GetLastWriteTime(activeSave.SaveProfilePath)) == 0)
+            if (DateTime.Compare(saveBackup.SaveDate, File.GetLastWriteTime(this.activeSave.SaveProfilePath)) == 0)
             {
                 return true;
             }
@@ -326,7 +325,7 @@ namespace RemnantSaveManager
 
         public void logMessage(string msg)
         {
-            logMessage(msg, Colors.White);
+            this.logMessage(msg, Colors.White);
         }
 
         public void logMessage(string msg, LogType lt)
@@ -340,23 +339,23 @@ namespace RemnantSaveManager
             {
                 color = Color.FromRgb(200, 0, 0);
             }
-            logMessage(msg, color);
+            this.logMessage(msg, color);
         }
 
         public void logMessage(string msg, Color color)
         {
-            if (!suppressLog)
+            if (!this.suppressLog)
             {
-                txtLog.Text = txtLog.Text + Environment.NewLine + DateTime.Now.ToString() + ": " + msg;
-                lblLastMessage.Content = msg;
-                lblLastMessage.Foreground = new SolidColorBrush(color);
+                this.txtLog.Text = this.txtLog.Text + Environment.NewLine + DateTime.Now.ToString() + ": " + msg;
+                this.lblLastMessage.Content = msg;
+                this.lblLastMessage.Foreground = new SolidColorBrush(color);
                 if (color.Equals(Colors.White))
                 {
-                    lblLastMessage.FontWeight = FontWeights.Normal;
+                    this.lblLastMessage.FontWeight = FontWeights.Normal;
                 }
                 else
                 {
-                    lblLastMessage.FontWeight = FontWeights.Bold;
+                    this.lblLastMessage.FontWeight = FontWeights.Bold;
                 }
             }
             if (Properties.Settings.Default.CreateLogFile)
@@ -381,8 +380,8 @@ namespace RemnantSaveManager
             {
                 if (!this.listBackups[i].Keep && !this.listBackups[i].Active && this.listBackups[i].Name == this.listBackups[i].SaveDate.Ticks.ToString())
                 {
-                    logMessage("Deleting backup " + listBackups[i].Name + " (" + listBackups[i].SaveDate + ")");
-                    removeBackups.Add(listBackups[i]);
+                    this.logMessage("Deleting backup " + this.listBackups[i].Name + " (" + this.listBackups[i].SaveDate + ")");
+                    removeBackups.Add(this.listBackups[i]);
                 }
             }
 
@@ -396,20 +395,20 @@ namespace RemnantSaveManager
 
         private void BtnBackup_Click(object sender, RoutedEventArgs e)
         {
-            doBackup();
+            this.doBackup();
         }
 
         private void doBackup()
         {
             try
             {
-                if (!activeSave.Valid)
+                if (!this.activeSave.Valid)
                 {
-                    logMessage("Active save is not valid; backup skipped.");
+                    this.logMessage("Active save is not valid; backup skipped.");
                     return;
                 }
                 int existingSaveIndex = -1;
-                DateTime saveDate = File.GetLastWriteTime(activeSave.SaveProfilePath);
+                DateTime saveDate = File.GetLastWriteTime(this.activeSave.SaveProfilePath);
                 string backupFolder = backupDirPath + "\\" + saveDate.Ticks;
                 if (!Directory.Exists(backupFolder))
                 {
@@ -417,9 +416,9 @@ namespace RemnantSaveManager
                 }
                 else if (RemnantSave.ValidSaveFolder(backupFolder))
                 {
-                    for (int i=listBackups.Count-1; i >= 0; i--)
+                    for (int i=this.listBackups.Count-1; i >= 0; i--)
                     {
-                        if (listBackups[i].SaveDate.Ticks == saveDate.Ticks)
+                        if (this.listBackups[i].SaveDate.Ticks == saveDate.Ticks)
                         {
                             existingSaveIndex = i;
                             break;
@@ -430,8 +429,8 @@ namespace RemnantSaveManager
                     File.Copy(file, backupFolder + "\\" + System.IO.Path.GetFileName(file), true);
                 if (RemnantSave.ValidSaveFolder(backupFolder))
                 {
-                    Dictionary<long, string> backupNames = getSavedBackupNames();
-                    Dictionary<long, bool> backupKeeps = getSavedBackupKeeps();
+                    Dictionary<long, string> backupNames = this.getSavedBackupNames();
+                    Dictionary<long, bool> backupKeeps = this.getSavedBackupKeeps();
                     SaveBackup backup = new SaveBackup(backupFolder);
                     if (backupNames.ContainsKey(backup.SaveDate.Ticks))
                     {
@@ -441,32 +440,32 @@ namespace RemnantSaveManager
                     {
                         backup.Keep = backupKeeps[backup.SaveDate.Ticks];
                     }
-                    foreach (SaveBackup saveBackup in listBackups)
+                    foreach (SaveBackup saveBackup in this.listBackups)
                     {
                         saveBackup.Active = false;
                     }
                     backup.Active = true;
-                    backup.Updated += saveUpdated;
+                    backup.Updated += this.saveUpdated;
                     if (existingSaveIndex > -1)
                     {
-                        listBackups[existingSaveIndex] = backup;
+                        this.listBackups[existingSaveIndex] = backup;
                     } else
                     {
-                        listBackups.Add(backup);
+                        this.listBackups.Add(backup);
                     }
                 }
                 this.CheckBackupLimit();
-                dataBackups.Items.Refresh();
+                this.dataBackups.Items.Refresh();
                 this.ActiveSaveIsBackedUp = true;
-                logMessage($"Backup completed ({saveDate.ToString()})!", LogType.Success);
+                this.logMessage($"Backup completed ({saveDate.ToString()})!", LogType.Success);
             }
             catch (IOException ex)
             {
                 if (ex.Message.Contains("being used by another process"))
                 {
-                    logMessage("Save file in use; waiting 0.5 seconds and retrying.");
+                    this.logMessage("Save file in use; waiting 0.5 seconds and retrying.");
                     System.Threading.Thread.Sleep(500);
-                    doBackup();
+                    this.doBackup();
                 }
             }
         }
@@ -493,7 +492,7 @@ namespace RemnantSaveManager
                 this.logMessage("Choose a backup to restore from the list!", LogType.Error);
                 return;
             }
-            SaveBackup selectedBackup = (SaveBackup)dataBackups.SelectedItem;
+            SaveBackup selectedBackup = (SaveBackup)this.dataBackups.SelectedItem;
 
             this.restoreDialog = new RestoreDialog(this, selectedBackup, this.activeSave);
             this.restoreDialog.Owner = this;
@@ -604,7 +603,7 @@ namespace RemnantSaveManager
                 this.logMessage("Choose a backup to restore from the list!", LogType.Error);
                 return;
             }
-            SaveBackup selectedBackup = (SaveBackup)dataBackups.SelectedItem;
+            SaveBackup selectedBackup = (SaveBackup)this.dataBackups.SelectedItem;
 
             this.restoreDialog = new RestoreDialog(this, selectedBackup, this.activeSave);
             this.restoreDialog.Owner = this;
@@ -618,13 +617,13 @@ namespace RemnantSaveManager
 
         private void ChkAutoBackup_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.AutoBackup = chkAutoBackup.IsChecked.HasValue ? chkAutoBackup.IsChecked.Value : false;
+            Properties.Settings.Default.AutoBackup = this.chkAutoBackup.IsChecked.HasValue ? this.chkAutoBackup.IsChecked.Value : false;
             Properties.Settings.Default.Save();
         }
 
         private void OnSaveFileChanged(object source, FileSystemEventArgs e)
         {
-            if (activeSave.SaveType == RemnantSaveType.WindowsStore)
+            if (this.activeSave.SaveType == RemnantSaveType.WindowsStore)
             {
                 var newSave = new RemnantSave(saveDirPath);
                 if (!newSave.Valid)
@@ -632,7 +631,7 @@ namespace RemnantSaveManager
                     return;
 
                 }
-                activeSave = newSave;
+                this.activeSave = newSave;
             }
             // Specify what is done when a file is changed, created, or deleted.
             this.Dispatcher.Invoke(() =>
@@ -643,18 +642,18 @@ namespace RemnantSaveManager
                     //four times in relatively rapid succession.
                     //This timer is refreshed each time the save is modified,
                     //and a backup only occurs after the timer expires.
-                    saveTimer.Interval = 10000;
-                    saveTimer.Enabled = true;
-                    saveCount++;
-                    if (saveCount == 4)
+                    this.saveTimer.Interval = 10000;
+                    this.saveTimer.Enabled = true;
+                    this.saveCount++;
+                    if (this.saveCount == 4)
                     {
-                        updateCurrentWorldAnalyzer();
-                        saveCount = 0;
+                        this.updateCurrentWorldAnalyzer();
+                        this.saveCount = 0;
                     }
                 }
                 catch (Exception ex)
                 {
-                    logMessage(ex.GetType()+" setting save file timer: " +ex.Message+"("+ex.StackTrace+")");
+                    this.logMessage(ex.GetType()+" setting save file timer: " +ex.Message+"("+ex.StackTrace+")");
                 }
             });
         }
@@ -671,9 +670,9 @@ namespace RemnantSaveManager
                         //logMessage($"Save: {File.GetLastWriteTime(e.FullPath)}; Last backup: {File.GetLastWriteTime(listBackups[listBackups.Count - 1].Save.SaveFolderPath + "\\profile.sav")}");
                         DateTime latestBackupTime;
                         DateTime newBackupTime;
-                        if (listBackups.Count > 0)
+                        if (this.listBackups.Count > 0)
                         {
-                            latestBackupTime = listBackups[listBackups.Count - 1].SaveDate;
+                            latestBackupTime = this.listBackups[this.listBackups.Count - 1].SaveDate;
                             newBackupTime = latestBackupTime.AddMinutes(Properties.Settings.Default.BackupMinutes);
                         }
                         else
@@ -683,38 +682,38 @@ namespace RemnantSaveManager
                         }
                         if (DateTime.Compare(DateTime.Now, newBackupTime) >= 0)
                         {
-                            doBackup();
+                            this.doBackup();
                         }
                         else
                         {
                             this.ActiveSaveIsBackedUp = false;
-                            foreach (SaveBackup backup in listBackups)
+                            foreach (SaveBackup backup in this.listBackups)
                             {
                                 if (backup.Active) backup.Active = false;
                             }
-                            dataBackups.Items.Refresh();
+                            this.dataBackups.Items.Refresh();
                             TimeSpan span = (newBackupTime - DateTime.Now);
-                            logMessage($"Save change detected, but {span.Minutes + Math.Round(span.Seconds / 60.0, 2)} minutes, left until next backup");
+                            this.logMessage($"Save change detected, but {span.Minutes + Math.Round(span.Seconds / 60.0, 2)} minutes, left until next backup");
                         }
                     }
-                    if (saveCount != 0)
+                    if (this.saveCount != 0)
                     {
-                        updateCurrentWorldAnalyzer();
-                        saveCount = 0;
+                        this.updateCurrentWorldAnalyzer();
+                        this.saveCount = 0;
                     }
 
-                    if (gameProcess == null || gameProcess.HasExited)
+                    if (this.gameProcess == null || this.gameProcess.HasExited)
                     {
                         Process[] processes = Process.GetProcessesByName("Remnant");
                         if (processes.Length > 0)
                         {
-                            gameProcess = processes[0];
-                            gameProcess.EnableRaisingEvents = true;
-                            gameProcess.Exited += (s, eargs) =>
+                            this.gameProcess = processes[0];
+                            this.gameProcess.EnableRaisingEvents = true;
+                            this.gameProcess.Exited += (s, eargs) =>
                             {
                                 this.Dispatcher.Invoke(() =>
                                 {
-                                    doBackup();
+                                    this.doBackup();
                                 });
                             };
                         }
@@ -722,27 +721,27 @@ namespace RemnantSaveManager
                 }
                 catch (Exception ex)
                 {
-                    logMessage(ex.GetType() + " processing save file change: " + ex.Message + "(" + ex.StackTrace + ")");
+                    this.logMessage(ex.GetType() + " processing save file change: " + ex.Message + "(" + ex.StackTrace + ")");
                 }
             });
         }
 
         private void TxtBackupMins_LostFocus(object sender, RoutedEventArgs e)
         {
-            updateBackupMins();
+            this.updateBackupMins();
         }
 
         private void TxtBackupMins_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                updateBackupMins();
+                this.updateBackupMins();
             }
         }
 
         private void updateBackupMins()
         {
-            string txt = txtBackupMins.Text;
+            string txt = this.txtBackupMins.Text;
             int mins;
             bool valid = false;
             if (txt.Length > 0)
@@ -767,7 +766,7 @@ namespace RemnantSaveManager
             }
             if (!valid)
             {
-                txtBackupMins.Text = Properties.Settings.Default.BackupMinutes.ToString();
+                this.txtBackupMins.Text = Properties.Settings.Default.BackupMinutes.ToString();
             }
         }
 
@@ -775,18 +774,18 @@ namespace RemnantSaveManager
         {
             if (e.Key == Key.Enter)
             {
-                updateBackupLimit();
+                this.updateBackupLimit();
             }
         }
 
         private void TxtBackupLimit_LostFocus(object sender, RoutedEventArgs e)
         {
-            updateBackupLimit();
+            this.updateBackupLimit();
         }
 
         private void updateBackupLimit()
         {
-            string txt = txtBackupLimit.Text;
+            string txt = this.txtBackupLimit.Text;
             int num;
             bool valid = false;
             if (txt.Length > 0)
@@ -811,7 +810,7 @@ namespace RemnantSaveManager
             }
             if (!valid)
             {
-                txtBackupLimit.Text = Properties.Settings.Default.BackupLimit.ToString();
+                this.txtBackupLimit.Text = Properties.Settings.Default.BackupLimit.ToString();
             }
         }
 
@@ -827,8 +826,8 @@ namespace RemnantSaveManager
                 {
                     if (!this.listBackups[i].Keep && !this.listBackups[i].Active && (!keepNamed || this.listBackups[i].Name == this.listBackups[i].SaveDate.Ticks.ToString()))
                     {
-                        logMessage("Deleting excess backup " + listBackups[i].Name + " (" + listBackups[i].SaveDate + ")");
-                        removeBackups.Add(listBackups[i]);
+                        this.logMessage("Deleting excess backup " + this.listBackups[i].Name + " (" + this.listBackups[i].SaveDate + ")");
+                        removeBackups.Add(this.listBackups[i]);
                         delNum--;
                     }
                 }
@@ -838,7 +837,7 @@ namespace RemnantSaveManager
                     Directory.Delete(backupDirPath + "\\" + backup.SaveDate.Ticks, true);
                     this.listBackups.Remove(backup);
                 }
-                dataBackups.Items.Refresh();
+                this.dataBackups.Items.Refresh();
             }
         }
 
@@ -846,7 +845,7 @@ namespace RemnantSaveManager
         {
             if (!Directory.Exists(backupDirPath))
             {
-                logMessage("Backups folder not found, creating...");
+                this.logMessage("Backups folder not found, creating...");
                 Directory.CreateDirectory(backupDirPath);
             }
             Process.Start(backupDirPath+"\\");
@@ -904,9 +903,9 @@ namespace RemnantSaveManager
         private void updateSavedNames()
         {
             List<string> savedNames = new List<string>();
-            for (int i = 0; i < listBackups.Count; i++)
+            for (int i = 0; i < this.listBackups.Count; i++)
             {
-                SaveBackup s = listBackups[i];
+                SaveBackup s = this.listBackups[i];
                 if (!s.Name.Equals(s.SaveDate.Ticks.ToString()))
                 {
                     savedNames.Add(s.SaveDate.Ticks + "=" + System.Net.WebUtility.UrlEncode(s.Name));
@@ -929,9 +928,9 @@ namespace RemnantSaveManager
         private void updateSavedKeeps()
         {
             List<string> savedKeeps = new List<string>();
-            for (int i = 0; i < listBackups.Count; i++)
+            for (int i = 0; i < this.listBackups.Count; i++)
             {
-                SaveBackup s = listBackups[i];
+                SaveBackup s = this.listBackups[i];
                 if (s.Keep)
                 {
                     savedKeeps.Add(s.SaveDate.Ticks + "=True");
@@ -950,11 +949,11 @@ namespace RemnantSaveManager
 
         private void DataBackups_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MenuItem analyzeMenu = ((MenuItem)dataBackups.ContextMenu.Items[0]);
-            MenuItem deleteMenu = ((MenuItem)dataBackups.ContextMenu.Items[1]);
+            MenuItem analyzeMenu = ((MenuItem)this.dataBackups.ContextMenu.Items[0]);
+            MenuItem deleteMenu = ((MenuItem)this.dataBackups.ContextMenu.Items[1]);
             if (e.AddedItems.Count > 0)
             {
-                SaveBackup selectedBackup = (SaveBackup)(dataBackups.SelectedItem);
+                SaveBackup selectedBackup = (SaveBackup)(this.dataBackups.SelectedItem);
 
                 analyzeMenu.IsEnabled = true;
                 deleteMenu.IsEnabled = true;
@@ -968,35 +967,35 @@ namespace RemnantSaveManager
 
         private void analyzeMenuItem_Click(object sender, System.EventArgs e)
         {
-            SaveBackup saveBackup = (SaveBackup)dataBackups.SelectedItem;
-            logMessage("Showing backup save (" + saveBackup.Name + ") world analyzer...");
+            SaveBackup saveBackup = (SaveBackup)this.dataBackups.SelectedItem;
+            this.logMessage("Showing backup save (" + saveBackup.Name + ") world analyzer...");
             SaveAnalyzer analyzer = new SaveAnalyzer(this);
             analyzer.Title = "Backup Save ("+saveBackup.Name+") World Analyzer";
-            analyzer.Closing += Backup_Analyzer_Closing;
+            analyzer.Closing += this.Backup_Analyzer_Closing;
             List<RemnantCharacter> chars = saveBackup.Save.Characters;
             for (int i = 0; i < chars.Count; i++)
             {
                 chars[i].LoadWorldData(i);
             }
             analyzer.LoadData(chars);
-            backupSaveAnalyzers.Add(analyzer);
+            this.backupSaveAnalyzers.Add(analyzer);
             analyzer.Show();
         }
 
         private void Backup_Analyzer_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            backupSaveAnalyzers.Remove((SaveAnalyzer)sender);
+            this.backupSaveAnalyzers.Remove((SaveAnalyzer)sender);
         }
 
         private void openFolderMenuItem_Click(object sender, System.EventArgs e)
         {
-            SaveBackup selectedBackup = (SaveBackup)dataBackups.SelectedItem;
+            SaveBackup selectedBackup = (SaveBackup)this.dataBackups.SelectedItem;
             Process.Start(backupDirPath + "\\" + selectedBackup.SaveDate.Ticks);
         }
 
         private void deleteMenuItem_Click(object sender, System.EventArgs e)
         {
-            SaveBackup save = (SaveBackup)dataBackups.SelectedItem;
+            SaveBackup save = (SaveBackup)this.dataBackups.SelectedItem;
             var confirmResult = MessageBox.Show("Are you sure to delete backup \"" + save.Name + "\" (" + save.SaveDate.ToString() + ")?",
                                      "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
             if (confirmResult == MessageBoxResult.Yes)
@@ -1018,36 +1017,36 @@ namespace RemnantSaveManager
                 {
                     Directory.Delete(backupDirPath + "\\" + save.SaveDate.Ticks, true);
                 }
-                listBackups.Remove(save);
-                dataBackups.Items.Refresh();
-                logMessage("Backup \"" + save.Name + "\" (" + save.SaveDate + ") deleted.");
+                this.listBackups.Remove(save);
+                this.dataBackups.Items.Refresh();
+                this.logMessage("Backup \"" + save.Name + "\" (" + save.SaveDate + ") deleted.");
             }
         }
 
         private void BtnAnalyzeCurrent_Click(object sender, RoutedEventArgs e)
         {
-            logMessage("Showing current save world analyzer...");
-            activeSaveAnalyzer.Show();
+            this.logMessage("Showing current save world analyzer...");
+            this.activeSaveAnalyzer.Show();
         }
 
         private void updateCurrentWorldAnalyzer()
         {
-            activeSave.UpdateCharacters();
+            this.activeSave.UpdateCharacters();
             /*for (int i = 0; i < activeSave.Characters.Count; i++)
             {
                 Console.WriteLine(activeSave.Characters[i]);
             }*/
-            activeSaveAnalyzer.LoadData(activeSave.Characters);
+            this.activeSaveAnalyzer.LoadData(this.activeSave.Characters);
         }
 
         private void OnGameInfoUpdate(object source, GameInfoUpdateEventArgs e)
         {
             this.Dispatcher.Invoke(() =>
             {
-                logMessage(e.Message);
+                this.logMessage(e.Message);
                 if (e.Result == GameInfoUpdateResult.Updated)
                 {
-                    updateCurrentWorldAnalyzer();
+                    this.updateCurrentWorldAnalyzer();
                 }
             });
         }
@@ -1066,12 +1065,12 @@ namespace RemnantSaveManager
                 try
                 {
                     WebClient client = new WebClient();
-                    string source = client.DownloadString("https://github.com/Razzmatazzz/RemnantSaveManager/releases/latest");
+                    string source = client.DownloadString("https://github.com/TheNasbit/RemnantSaveManager/releases/latest");
                     string title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
                     string remoteVer = Regex.Match(source, @"Remnant Save Manager (?<Version>([\d.]+)?)", RegexOptions.IgnoreCase).Groups["Version"].Value;
 
                     Version remoteVersion = new Version(remoteVer);
-                    Version localVersion = typeof(MainWindow).Assembly.GetName().Version;
+                    Version localVersion = typeof(Manager).Assembly.GetName().Version;
 
                     this.Dispatcher.Invoke(() =>
                     {
@@ -1082,7 +1081,7 @@ namespace RemnantSaveManager
                                      "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
                             if (confirmResult == MessageBoxResult.Yes)
                             {
-                                Process.Start("https://github.com/Razzmatazzz/RemnantSaveManager/releases/latest");
+                                Process.Start("https://github.com/TheNasbit/RemnantSaveManager/releases/latest");
                                 System.Environment.Exit(1);
                             }
                         } else
@@ -1095,11 +1094,11 @@ namespace RemnantSaveManager
                 {
                     this.Dispatcher.Invoke(() =>
                     {
-                        logMessage("Error checking for new version: " + ex.Message, LogType.Error);
+                        this.logMessage("Error checking for new version: " + ex.Message, LogType.Error);
                     });
                 }
             }).Start();
-            lastUpdateCheck = DateTime.Now;
+            this.lastUpdateCheck = DateTime.Now;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -1136,7 +1135,7 @@ namespace RemnantSaveManager
                 {
                     return;
                 }
-                if (listBackups.Count > 0)
+                if (this.listBackups.Count > 0)
                 {
                     var confirmResult = MessageBox.Show("Do you want to move your backups to this new folder?",
                                      "Move Backups", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
@@ -1158,11 +1157,11 @@ namespace RemnantSaveManager
                         }
                     }
                 }
-                txtBackupFolder.Text = folderName;
+                this.txtBackupFolder.Text = folderName;
                 backupDirPath = folderName;
                 Properties.Settings.Default.BackupFolder = folderName;
                 Properties.Settings.Default.Save();
-                loadBackups();
+                this.loadBackups();
             }
         }
 
@@ -1175,30 +1174,30 @@ namespace RemnantSaveManager
 
         private void btnGameInfoUpdate_Click(object sender, RoutedEventArgs e)
         {
-            if (lastUpdateCheck.AddMinutes(10) < DateTime.Now)
+            if (this.lastUpdateCheck.AddMinutes(10) < DateTime.Now)
             {
-                checkForUpdate();
+                this.checkForUpdate();
             }
             else
             {
-                TimeSpan span = (lastUpdateCheck.AddMinutes(10) - DateTime.Now);
-                logMessage("Please wait " + span.Minutes+" minutes, "+span.Seconds+" seconds before checking for update.");
+                TimeSpan span = (this.lastUpdateCheck.AddMinutes(10) - DateTime.Now);
+                this.logMessage("Please wait " + span.Minutes+" minutes, "+span.Seconds+" seconds before checking for update.");
             }
         }
 
         private void Window_Deactivated(object sender, EventArgs e)
         {
             //need to call twice for some reason
-            dataBackups.CancelEdit();
-            dataBackups.CancelEdit();
+            this.dataBackups.CancelEdit();
+            this.dataBackups.CancelEdit();
         }
 
         private void chkCreateLogFile_Click(object sender, RoutedEventArgs e)
         {
-            bool newValue = chkCreateLogFile.IsChecked ?? false;
+            bool newValue = this.chkCreateLogFile.IsChecked ?? false;
             if (newValue & !Properties.Settings.Default.CreateLogFile)
             {
-                System.IO.File.WriteAllText("log.txt", DateTime.Now.ToString() + ": Version " + typeof(MainWindow).Assembly.GetName().Version + "\r\n");
+                System.IO.File.WriteAllText("log.txt", DateTime.Now.ToString() + ": Version " + typeof(Manager).Assembly.GetName().Version + "\r\n");
             }
             Properties.Settings.Default.CreateLogFile = newValue;
             Properties.Settings.Default.Save();
@@ -1217,22 +1216,22 @@ namespace RemnantSaveManager
 
         private void cmbMissingItemColorSelectionChanged(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.MissingItemColor = cmbMissingItemColor.SelectedItem.ToString();
+            Properties.Settings.Default.MissingItemColor = this.cmbMissingItemColor.SelectedItem.ToString();
             Properties.Settings.Default.Save();
-            updateCurrentWorldAnalyzer();
+            this.updateCurrentWorldAnalyzer();
         }
 
         private void chkShowPossibleItems_Click(object sender, RoutedEventArgs e)
         {
-            bool newValue = chkShowPossibleItems.IsChecked.HasValue ? chkShowPossibleItems.IsChecked.Value : false;
+            bool newValue = this.chkShowPossibleItems.IsChecked.HasValue ? this.chkShowPossibleItems.IsChecked.Value : false;
             Properties.Settings.Default.ShowPossibleItems = newValue;
             Properties.Settings.Default.Save();
-            updateCurrentWorldAnalyzer();
+            this.updateCurrentWorldAnalyzer();
         }
 
         private void chkAutoCheckUpdate_Click(object sender, RoutedEventArgs e)
         {
-            bool newValue = chkAutoCheckUpdate.IsChecked.HasValue ? chkAutoCheckUpdate.IsChecked.Value : false;
+            bool newValue = this.chkAutoCheckUpdate.IsChecked.HasValue ? this.chkAutoCheckUpdate.IsChecked.Value : false;
             Properties.Settings.Default.AutoCheckUpdate = newValue;
             Properties.Settings.Default.Save();
         }
@@ -1262,7 +1261,7 @@ namespace RemnantSaveManager
                                      "Invalid Folder", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
                     return;
                 }
-                txtSaveFolder.Text = folderName;
+                this.txtSaveFolder.Text = folderName;
                 saveDirPath = folderName;
                 Properties.Settings.Default.SaveFolder = folderName;
                 Properties.Settings.Default.Save();
@@ -1271,8 +1270,8 @@ namespace RemnantSaveManager
                 {
                     return;
                 }
-                activeSave = newSave;
-                updateCurrentWorldAnalyzer();
+                this.activeSave = newSave;
+                this.updateCurrentWorldAnalyzer();
             }
         }
 
@@ -1315,7 +1314,7 @@ namespace RemnantSaveManager
                         {
                             if (File.Exists(steamRemnantInstallPath + "\\Remnant.exe"))
                             {
-                                SetGameFolder(steamRemnantInstallPath);
+                                this.SetGameFolder(steamRemnantInstallPath);
                                 return;
                             }
                         }
@@ -1419,7 +1418,7 @@ namespace RemnantSaveManager
                     return;
                 }
 
-                SetGameFolder(folderName);
+                this.SetGameFolder(folderName);
             }
         }
 

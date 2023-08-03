@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
-namespace RemnantSaveManager
+namespace RemnantSaveManager.Remnant
 {
     public class RemnantSave
     {
@@ -34,7 +31,7 @@ namespace RemnantSaveManager
                 {
                     this.winSave = new WindowsSave(winFiles[0]);
                     this.saveType = RemnantSaveType.WindowsStore;
-                    profileFile = winSave.Profile;
+                    this.profileFile = this.winSave.Profile;
                 }
                 else
                 {
@@ -42,7 +39,7 @@ namespace RemnantSaveManager
                 }
             }
             this.savePath = path;
-            saveCharacters = RemnantCharacter.GetCharactersFromSave(this, RemnantCharacter.CharacterProcessingMode.NoEvents);
+            this.saveCharacters = RemnantCharacter.GetCharactersFromSave(this, RemnantCharacter.CharacterProcessingMode.NoEvents);
         }
 
         public string SaveFolderPath
@@ -69,7 +66,7 @@ namespace RemnantSaveManager
         {
             get
             {
-                return saveCharacters;
+                return this.saveCharacters;
             }
         }
         public string[] WorldSaves
@@ -78,7 +75,7 @@ namespace RemnantSaveManager
             {
                 if (this.saveType == RemnantSaveType.Normal)
                 {
-                    return Directory.GetFiles(SaveFolderPath, "save_*.sav");
+                    return Directory.GetFiles(this.SaveFolderPath, "save_*.sav");
                 }
                 else
                 {
@@ -120,12 +117,12 @@ namespace RemnantSaveManager
 
         public void UpdateCharacters()
         {
-            saveCharacters = RemnantCharacter.GetCharactersFromSave(this);
+            this.saveCharacters = RemnantCharacter.GetCharactersFromSave(this);
         }
 
         public void UpdateCharacters(RemnantCharacter.CharacterProcessingMode mode)
         {
-            saveCharacters = RemnantCharacter.GetCharactersFromSave(this, mode);
+            this.saveCharacters = RemnantCharacter.GetCharactersFromSave(this, mode);
         }
     }
 

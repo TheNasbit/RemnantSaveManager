@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
 using System.Windows;
+using RemnantSaveManager.RemnantTwo;
 
-namespace RemnantSaveManager
+namespace RemnantSaveManager.RemnantTwo.Views
 {
     /// <summary>
     /// Interaction logic for RestoreDialog.xaml
@@ -9,9 +10,9 @@ namespace RemnantSaveManager
     public partial class RestoreDialog : Window
     {
         private SaveBackup _saveBackup;
-        private RemnantSave _activeSave;
+        private RemnantTwoSave _activeSave;
         public string Result { get; set; }
-        public RestoreDialog(MainWindow @mw, SaveBackup @sb, RemnantSave @as)
+        public RestoreDialog(Manager @mw, SaveBackup @sb, RemnantTwoSave @as)
         {
             InitializeComponent();
             this.txtSave.Content = $"Save Name:\t{sb.Name}\nSave Date:\t{sb.SaveDate.ToString(CultureInfo.CurrentCulture)}";
@@ -21,28 +22,15 @@ namespace RemnantSaveManager
 
         private void btnCharacter_Click(object sender, RoutedEventArgs e)
         {
-            Result = "Character";
-            DialogResult = true;
+            this.Result = "Character";
+            this.DialogResult = true;
             this.Close();
         }
 
         private void btnAllWorlds_Click(object sender, RoutedEventArgs e)
         {
-
-            if (this._saveBackup.Save.Characters.Count != this._activeSave.Characters.Count)
-            {
-                MessageBoxResult confirmResult = MessageBox.Show("The active save has a different number of characters than the backup worlds you are restoring. This may result in unexpected behavior. Proceed?",
-                                     "Character Mismatch", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
-                if (confirmResult == MessageBoxResult.No)
-                {
-                    DialogResult = false;
-                    this.Close();
-                    return;
-                }
-            }
-
-            Result = "Worlds";
-            DialogResult = true;
+            this.Result = "Worlds";
+            this.DialogResult = true;
             this.Close();
         }
         private void btnWorld_Click(object sender, RoutedEventArgs e)
@@ -51,20 +39,20 @@ namespace RemnantSaveManager
                                      "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
             if (confirmResult == MessageBoxResult.No)
             {
-                DialogResult = false;
+                this.DialogResult = false;
                 this.Close();
                 return;
             }
 
-            Result = "World";
-            DialogResult = true;
+            this.Result = "World";
+            this.DialogResult = true;
             this.Close();
         }
 
         private void btnAll_Click(object sender, RoutedEventArgs e)
         {
-            Result = "All";
-            DialogResult = true;
+            this.Result = "All";
+            this.DialogResult = true;
             this.Close();
         }
     }

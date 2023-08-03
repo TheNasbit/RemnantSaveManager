@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 using System.IO;
 
-namespace RemnantSaveManager
+namespace RemnantSaveManager.RemnantTwo
 {
     public class SaveBackup : IEditableObject
     {
@@ -24,7 +20,7 @@ namespace RemnantSaveManager
         private bool inTxn = false;
         //private int[] progression;
         //private List<RemnantCharacter> charData;
-        private RemnantSave save;
+        private RemnantTwoSave save;
         public string Name
         {
             get
@@ -36,7 +32,8 @@ namespace RemnantSaveManager
                 if (value.Equals(""))
                 {
                     this.saveData.name = this.saveData.date.Ticks.ToString();
-                } else
+                }
+                else
                 {
                     this.saveData.name = value;
                 }
@@ -45,20 +42,14 @@ namespace RemnantSaveManager
         }
         public DateTime SaveDate
         {
-            get {
+            get
+            {
                 return this.saveData.date;
             }
             set
             {
                 this.saveData.date = value;
                 //OnUpdated(new UpdatedEventArgs("SaveDate"));
-            }
-        }
-        public string Progression
-        {
-            get
-            {
-                return string.Join(",", this.save.Characters);
             }
         }
         public bool Keep
@@ -86,90 +77,71 @@ namespace RemnantSaveManager
             }
         }
 
-        public RemnantSave Save
+        public RemnantTwoSave Save
         {
             get
             {
-                return save;
+                return this.save;
             }
         }
 
         //public SaveBackup(DateTime saveDate)
         public SaveBackup(string savePath)
         {
-            this.save = new RemnantSave(savePath);
+            this.save = new RemnantTwoSave(savePath);
             this.saveData = new SaveData();
             this.saveData.name = this.SaveDateTime.Ticks.ToString();
             this.saveData.date = this.SaveDateTime;
             this.saveData.keep = false;
         }
 
-        /*public void setProgression(List<List<string>> allItemList)
-        {
-
-            int[] prog = new int[allItemList.Count];
-            for (int i=0; i < allItemList.Count; i++)
-            {
-                prog[i] = allItemList[i].Count;
-            }
-            this.progression = prog;
-        }
-        public List<RemnantCharacter> GetCharacters()
-        {
-            return this.charData;
-        }
-        public void LoadCharacterData(string saveFolder)
-        {
-            this.charData = RemnantCharacter.GetCharactersFromSave(saveFolder, RemnantCharacter.CharacterProcessingMode.NoEvents);
-        }*/
-
         // Implements IEditableObject
         void IEditableObject.BeginEdit()
         {
-            if (!inTxn)
+            if (!this.inTxn)
             {
-                this.backupData = saveData;
-                inTxn = true;
+                this.backupData = this.saveData;
+                this.inTxn = true;
             }
         }
 
         void IEditableObject.CancelEdit()
         {
-            if (inTxn)
+            if (this.inTxn)
             {
-                this.saveData = backupData;
-                inTxn = false;
+                this.saveData = this.backupData;
+                this.inTxn = false;
             }
         }
 
         void IEditableObject.EndEdit()
         {
-            if (inTxn)
+            if (this.inTxn)
             {
-                if (!backupData.name.Equals(saveData.name))
+                if (!this.backupData.name.Equals(this.saveData.name))
                 {
-                    OnUpdated(new UpdatedEventArgs("Name"));
+                    this.OnUpdated(new UpdatedEventArgs("Name"));
                 }
-                if (!backupData.date.Equals(saveData.date))
+                if (!this.backupData.date.Equals(this.saveData.date))
                 {
-                    OnUpdated(new UpdatedEventArgs("SaveDate"));
+                    this.OnUpdated(new UpdatedEventArgs("SaveDate"));
                 }
-                if (!backupData.keep.Equals(saveData.keep))
+                if (!this.backupData.keep.Equals(this.saveData.keep))
                 {
-                    OnUpdated(new UpdatedEventArgs("Keep"));
+                    this.OnUpdated(new UpdatedEventArgs("Keep"));
                 }
-                if (!backupData.active.Equals(saveData.active))
+                if (!this.backupData.active.Equals(this.saveData.active))
                 {
-                    OnUpdated(new UpdatedEventArgs("Active"));
+                    this.OnUpdated(new UpdatedEventArgs("Active"));
                 }
-                backupData = new SaveData();
-                inTxn = false;
+                this.backupData = new SaveData();
+                this.inTxn = false;
             }
         }
 
         public void OnUpdated(UpdatedEventArgs args)
         {
-            EventHandler<UpdatedEventArgs> handler = Updated;
+            EventHandler<UpdatedEventArgs> handler = this.Updated;
             if (null != handler) handler(this, args);
         }
 
@@ -177,7 +149,7 @@ namespace RemnantSaveManager
         {
             get
             {
-                return File.GetLastWriteTime(save.SaveProfilePath);
+                return File.GetLastWriteTime(this.save.SaveProfilePath);
             }
         }
     }
@@ -186,13 +158,14 @@ namespace RemnantSaveManager
     {
         private readonly string _fieldName;
 
-        public UpdatedEventArgs(string fieldName) {
-            _fieldName = fieldName;
+        public UpdatedEventArgs(string fieldName)
+        {
+            this._fieldName = fieldName;
         }
 
         public string FieldName
         {
-            get { return _fieldName; }
+            get { return this._fieldName; }
         }
     }
 }

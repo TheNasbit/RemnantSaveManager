@@ -96,23 +96,59 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="GameInfo.cs" />
-    <Compile Include="RemnantItem.cs" />
-    <Compile Include="RemnantSave.cs" />
-    <Compile Include="RestoreDialog.xaml.cs">
+    <Compile Include="Properties\SettingsTwo.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>SettingsTwo.settings</DependentUpon>
+    </Compile>
+    <Compile Include="RemnantTwo\RemnantTwoSave.cs" />
+    <Compile Include="RemnantTwo\SaveBackup.cs" />
+    <Compile Include="RemnantTwo\Views\RestoreDialog.xaml.cs">
       <DependentUpon>RestoreDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SaveAnalyzer.xaml.cs">
-      <DependentUpon>SaveAnalyzer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="SaveBackup.cs" />
-    <Compile Include="RemnantCharacter.cs" />
-    <Compile Include="RemnantWorldEvent.cs" />
-    <Compile Include="SelectWorldDialog.xaml.cs">
+    <Compile Include="RemnantTwo\Views\SelectWorldDialog.xaml.cs">
       <DependentUpon>SelectWorldDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Remnant\GameInfo.cs" />
+    <Compile Include="GameSelector.xaml.cs">
+      <DependentUpon>GameSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Remnant\RemnantItem.cs" />
+    <Compile Include="RemnantTwo\Views\Manager.xaml.cs">
+      <DependentUpon>Manager.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Remnant\RemnantSave.cs" />
+    <Compile Include="Remnant\Views\RestoreDialog.xaml.cs">
+      <DependentUpon>RestoreDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Remnant\Views\SaveAnalyzer.xaml.cs">
+      <DependentUpon>SaveAnalyzer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Remnant\SaveBackup.cs" />
+    <Compile Include="Remnant\RemnantCharacter.cs" />
+    <Compile Include="Remnant\RemnantWorldEvent.cs" />
+    <Compile Include="Remnant\Views\SelectWorldDialog.xaml.cs">
+      <DependentUpon>SelectWorldDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="WindowsSave.cs" />
-    <Page Include="MainWindow.xaml">
+    <Page Include="GameSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RemnantTwo\Views\Manager.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RemnantTwo\Views\RestoreDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RemnantTwo\Views\SelectWorldDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Remnant\Views\Manager.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -120,19 +156,19 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="Remnant\Views\Manager.xaml.cs">
+      <DependentUpon>Manager.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="RestoreDialog.xaml">
+    <Page Include="Remnant\Views\RestoreDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SaveAnalyzer.xaml">
+    <Page Include="Remnant\Views\SaveAnalyzer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SelectWorldDialog.xaml">
+    <Page Include="Remnant\Views\SelectWorldDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -155,6 +191,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Properties\SettingsTwo.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>SettingsTwo.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -204,6 +244,7 @@
   <ItemGroup>
     <Resource Include="Resources\SearchMember_32x.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(ProjectDir)Resources\GameInfo.xml" "$(TargetDir)"
